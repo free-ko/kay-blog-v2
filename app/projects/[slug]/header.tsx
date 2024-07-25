@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Github, Twitter } from 'lucide-react';
+import { ArrowLeft, Github, Twitter, Linkedin } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface IHeaderProps {
@@ -66,8 +66,11 @@ export const Header = ({ project }: IHeaderProps) => {
                   : 'text-zinc-600 hover:text-zinc-900'
               } `}
             ></span>
-            <Link target='_blank' href='https://twitter.com/chronark_'>
-              <Twitter
+            <Link
+              target='_blank'
+              href='https://www.linkedin.com/in/%EC%98%81%EC%9A%B1-%EA%B3%A0-74223921b/'
+            >
+              <Linkedin
                 className={`w-6 h-6 duration-200 hover:font-medium ${
                   isIntersecting
                     ? ' text-zinc-400 hover:text-zinc-100'
@@ -75,7 +78,7 @@ export const Header = ({ project }: IHeaderProps) => {
                 } `}
               />
             </Link>
-            <Link target='_blank' href='https://github.com/chronark'>
+            <Link target='_blank' href='https://github.com/free-ko'>
               <Github
                 className={`w-6 h-6 duration-200 hover:font-medium ${
                   isIntersecting
