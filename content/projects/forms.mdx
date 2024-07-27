@@ -26,6 +26,8 @@ published: true
 
 단순히 다운로스 수가 많다고 어떤 라이브러리가 더 좋다고 판단 할 수 없습니다. 대신 위에 보이는 라이브러리의 <b>사이즈, 최근 업데이트 날짜, 이슈 수</b> 등은 좋의 라이브러리를 판단하는 좋은 요소가 됩니다.
 
+![download.png](/download.png)
+
 ## Size
 
 `minzipped size`를 비교 했을 때, React Hook Form이 Fomik보다 4KB가 적습니다.
@@ -36,13 +38,19 @@ published: true
 
 종속성이 적을 수록 라이브러리는 좋습니다. 왜냐하면 Side Effect가 없어, 개발하는 프로젝트에 악영향을 미치지 않기 때문입니다.
 
+[Formik Module Composition](https://bundlephobia.com/package/formik@2.2.9)
+
 <b>Formik에는 8개의 종속된 요소들이 있습니다.</b>
+
+![formik_composition.png](/formik_composition.png)
 
 <br />
 
 [React Hook Form Module Composition](https://bundlephobia.com/package/react-hook-form@7.43.0)
 
 <b>React Hook Form에는 종속된 요소가 없습니다.</b>
+
+![react-hook-form_composition.png](/react-hook-form_composition.png)
 
 <br />
 
@@ -53,11 +61,15 @@ published: true
 
 ### Formik
 
-- 총 랜더링 수 30 이상
+<b>총 랜더링 수 30 이상</b>
+
+![](https://blog.logrocket.com/wp-content/uploads/2019/10/formik-re-renders.gif)
 
 ### React Hook Form
 
-- 총 랜더링 수 3
+<b>총 랜더링 수 3</b>
+
+![](https://blog.logrocket.com/wp-content/uploads/2019/10/react-hook-form-re-renders.gif)
 
 왜 이런 차이가 나는 걸까요?? 그 이유는 각각의 라이브러리의 아키텍처 설계 방식이 다르기 때문입니다. React Hook Form은 <b>비제어 컴포넌트 방식</b>으로 구현되어 있기에 불필요한 랜더링 이슈를 해결합니다.
 즉, 단일 Form 값 변경에 대해 전체 Form이 다시 랜더링 되는 것을 방지 합니다.
@@ -80,11 +92,15 @@ React 프로젝트 개발에 있어 또 다른 성능 문제는 React Component�
 - Committing Change : 1
 - Total time: 2070ms
 
+![](https://blog.logrocket.com/wp-content/uploads/2019/10/image4.png)
+
 ### React Hook Form
 
 - Mount : 1
 - Committing Change : 1
 - Total time: 1800ms
+
+![](https://blog.logrocket.com/wp-content/uploads/2019/10/image2.png)
 
 <br />
 
@@ -98,6 +114,8 @@ React Commit
 
 각 상황에 맞게 프로젝트 내부에 Formik과 React Hook Form을 사용하면 됩니다.
 추가로 아래는 Formik과 React Hook Form을 상황별로 정리한 내용입니다.
+
+![](https://free-ko.github.io/static/fc4674f14f1c718c9fec0ef841ceadbf/a016c/feature.png)
 
 <br />
 
