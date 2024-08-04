@@ -1,4 +1,4 @@
-# Kay Blog v2
+# Kay Blog - v2
 
 <br />
 
