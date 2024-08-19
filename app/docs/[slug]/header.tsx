@@ -5,7 +5,7 @@ import { ArrowLeft, Github, Twitter, Linkedin } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface IHeaderProps {
-  project: {
+  docs: {
     url?: string;
     title: string;
     description: string;
@@ -13,23 +13,23 @@ interface IHeaderProps {
   };
 }
 
-export const Header = ({ project }: IHeaderProps) => {
+export const Header = ({ docs }: IHeaderProps) => {
   const ref = useRef<HTMLElement>(null);
   const [isIntersecting, setIntersecting] = useState(true);
 
   const links: { label: string; href: string }[] = [];
 
-  if (project.repository) {
+  if (docs.repository) {
     links.push({
       label: 'GitHub',
-      href: `https://github.com/${project.repository}`,
+      href: `https://github.com/${docs.repository}`,
     });
   }
 
-  if (project.url) {
+  if (docs.url) {
     links.push({
       label: 'Website',
-      href: project.url,
+      href: docs.url,
     });
   }
 
@@ -105,10 +105,10 @@ export const Header = ({ project }: IHeaderProps) => {
         <div className='mx-auto max-w-7xl px-6 lg:px-8 text-center flex flex-col items-center'>
           <div className='mx-auto max-w-2xl lg:mx-0'>
             <h1 className='text-4xl font-bold tracking-tight text-white sm:text-6xl font-display'>
-              {project.title}
+              {docs.title}
             </h1>
             <p className='mt-6 text-lg leading-8 text-zinc-300'>
-              {project.description}
+              {docs.description}
             </p>
           </div>
 
