@@ -90,7 +90,7 @@ export const Header = ({ docs }: IHeaderProps) => {
           </div>
 
           <Link
-            href='/projects'
+            href='/docs'
             className={`duration-200 hover:font-medium ${
               isIntersecting
                 ? ' text-zinc-400 hover:text-zinc-100'
