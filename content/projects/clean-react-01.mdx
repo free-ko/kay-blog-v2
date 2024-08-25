@@ -32,6 +32,7 @@ published: true
 - ex) 무방비 상태, 정신 상태, 건강 상태, 이미 기차가 끊긴 상태
 
 <br />
+<br />
 
 # 2. 올바른 초기값 설정
 
@@ -56,6 +57,7 @@ published: true
 
 **초기 상태를 올바르게 설정하자**
 
+<br />
 <br />
 
 # 3. 업데이트 되지 않는 값
@@ -93,6 +95,7 @@ const NotUpdateValue = (): Element => {
 - 업데이트가 되지 않는 일반적인 객체
 - 리액트 상태로 바꾼다던가 혹은 아예 외부로 내보내야 함.
 
+<br />
 <br />
 
 # 4. 불필요한 상태 제거하기
@@ -132,12 +135,11 @@ const complUserList = complUserList.filter((user) => user.completed === true);
 3. 따라서 useState가 아닐, const로 상태를 선언하는게 좋은 경우도 있음
 
 <br />
+<br />
 
-# useState 대신 useRef
+# 5. useState 대신 useRef
 
----
-
-### 🌈 결론
+### 결론
 
 ```tsx
 // 기존
@@ -165,25 +167,26 @@ export const component = () => {
 };
 ```
 
-### ✍️ 내용
+### 내용
 
 ### 리렌더링 방지가 필요하다면 `useState` 대신 `useRef`
 
-**useRef**
+**useRef이란**
 
 - 가변 컨테이너
 - 한번 고정된 값을 컴포넌트 내부에서 사용할 경우 `useState`로 사용할 필요가 없음(컴포넌트의 전체적인 수명과 동일하게 지속된 정보를 일관적으로 제공해야 하는 경우)
-- 꼭 DOM을 직접 조작할 때만 useRef를 사용하는 것이 아님
+- 꼭 DOM을 직접 조작할 때만 `useRef`를 사용하는 것이 아님
 
-### ⭐️ 요약
+### 요약
 
 - `useState` 대신 `useRef` 를 사용하면 컴포넌트의 생명주기와 동일한 리렌더링되지 않는 상태를 만들 수 있다.
 
-# ✅ 연관된 상태 단순화하기
+<br />
+<br />
 
----
+# 6. 연관된 상태 단순화하기
 
-### 🌈 결론
+### 결론
 
 ```tsx
 // 기존
@@ -200,7 +203,7 @@ const PROMISE_STATE = {
 const [promiseState, setPromiseState] = useState(PROMISE_STATE);
 ```
 
-### ✍️ 내용
+### 내용
 
 - React 는 개발하는데 있어 자유로움
 - 여러 연관된 state를 만들어서 관리하는게 아니라, 하나의 불변의 값으로 관리
@@ -237,7 +240,7 @@ const [promiseState, setPromiseState] = useState(PROMISE_STATE);
   }
   ```
 
-### ⭐️ 요약
+### 요약
 
 - 리액트의 상태를 만들 때 `연관된 것들끼리 묶어서 처리`하면 에러를 방지하고 코드가 간결해진다.
 
