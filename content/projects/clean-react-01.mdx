@@ -245,12 +245,11 @@ const [promiseState, setPromiseState] = useState(PROMISE_STATE);
 - 리액트의 상태를 만들 때 `연관된 것들끼리 묶어서 처리`하면 에러를 방지하고 코드가 간결해진다.
 
 <br />
+<br />
 
-# ✅ useState 대신 useReducer로 리팩토링
+#  7. useState -> useReducer로 리팩토링
 
----
-
-### 🌈 결론
+###  결론
 
 ```tsx
 // 기존
@@ -261,7 +260,7 @@ const [isFinish, setIsFinish] = useState(false);
 const [state, dispatch] = useReducer(reducer, INIT_STATE);
 ```
 
-### ✍️ 내용
+### 내용
 
 - 구조화된 상태를 원한다면 `useReducer()`
 
@@ -288,7 +287,7 @@ const reducer = (state, action) => {
     case 'FETCH_LOADING':
       return { isLoading: true, isSuccess: false, isFail: false };
 
-    case 'FETCH_SUCESS':
+    case 'FETCH_SUCCESS':
       return { isLoading: false, isSuccess: true, isFail: false };
 
     case 'FETCH_FAIL':
@@ -324,17 +323,16 @@ const StateToReducer = () => {
 };
 ```
 
-### ⭐️ 요약
+### 요약
 
 - 여러 상태가 연관됐을 때, useState 대신, `useReducer를 사용하면 상태를 구조화` 할 수 있음
 
 <br />
+<br />
 
-# ✅ 상태 로직 Custom Hooks로 뽑아내기
+# 상태 로직 Custom Hooks로 뽑아내기
 
----
-
-### 🌈 결론
+### 결론
 
 ```tsx
 // 기존
@@ -358,7 +356,7 @@ if (state.isLoading) return <LoadingComponent />;
 if (state.isFail) return <FailComponent />;
 ```
 
-### ✍️ 내용
+### 내용
 
 - 로직만 뺌
 
@@ -385,7 +383,7 @@ const reducer = (state, action) => {
 		case 'FETCH_LOADING':
 			return { isLoading: true, isSuccess: false, isFail: false }
 
-		case 'FETCH_SUCESS':
+		case 'FETCH_SUCCESS':
 			return { isLoading: false, isSuccess: true, isFail: false }
 
 		case 'FETCH_FAIL':
@@ -429,17 +427,16 @@ const  CustomHooks= () => {
 }
 ```
 
-### ⭐️ 요약
+### 요약
 
 - `Custom Hooks를 사용하면` 코드를 확장성 있고 재사용 가능하게 작성할 수 있다.
 
 <br />
+<br />
 
-# ✅ 이전 상태 활용하기
+# 이전 상태 활용하기
 
----
-
-### 🌈 결론
+### 결론
 
 ```tsx
 setAge(age + 1);
@@ -447,7 +444,7 @@ setAge(age + 1);
 setAge((prevAge) => prevAge + 1);
 ```
 
-### ✍️ 내용
+### 내용
 
 - 타이밍을 확실히 하기 위해서 이전 상태 값을 가지고 업데이트 진행(update function)
 
@@ -461,7 +458,7 @@ const PrevState = () => {
 };
 ```
 
-### ⭐️ 요약
+### 요약
 
 - **updater function을 사용해 prev state를 고려**하면 예상치 못한 결과를 예방할 수 있다.
 
