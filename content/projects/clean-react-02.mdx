@@ -13,17 +13,17 @@ published: true
 
 ```tsx
 // 변경 전
-functino component({ value }) {
-	const [copyValue] = useState(무거운_연산(value));
+function component({ value }) {
+  const [copyValue] = useState(무거운_연산(value));
 
-	return <div>{copyValue}</div>
+  return <div>{copyValue}</div>;
 }
 
 // 변경 후
-functino component({ value }) {
-	const [copyValue] = useMemo(() => 무거운_연산(vlaue), [value])
+function component({ value }) {
+  const [copyValue] = useMemo(() => 무거운_연산(value), [value]);
 
-	return <div>{copyValue}</div>
+  return <div>{copyValue}</div>;
 }
 ```
 
@@ -35,7 +35,7 @@ functino component({ value }) {
   ```tsx
   function CopyProps({ value }) {
     const copyValue = 값_비싸고_무거운_연산(value);
-    const [copyValue] = useMemo(() => 무거운_연산(vlaue), [value]);
+    const [copyValue] = useMemo(() => 무거운_연산(value), [value]);
 
     return <div>{copyValue}</div>;
   }
@@ -65,26 +65,29 @@ functino component({ value }) {
   alt='image'
   src='image.jpg'
   style={{ width: 100 }}
-  className='clean-deiv'
+  className='clean-dev'
 />
 ```
 
 ### ✍️ 내용
 
-- Curly Brace 사용 O
-  - 값이 계산되는 경우(논리적인 숫자, Boolean, 객체, 배열, 함수 표현식)
-  - 객체를 넣어야 하는 경우
-- Curly Brace 사용 X
-  - 문자열일 경우
+1.  Curly Brace 사용 O
 
-```tsx
-<Image
-  alt={'image'}
-  src={'image.jpg'}
-  style={{ width: 100 }}
-  className='clean-deiv'
-/>
-```
+    - 값이 계산되는 경우(논리적인 숫자, Boolean, 객체, 배열, 함수 표현식)
+    - 객체를 넣어야 하는 경우
+
+2.  Curly Brace 사용 X
+
+    - 문자열일 경우
+
+           ```tsx
+           <Image
+             alt={'image'}
+             src={'image.jpg'}
+             style={{ width: 100 }}
+             className='clean-dev'
+           />
+           ```
 
 ### ⭐️ 요약
 
@@ -102,14 +105,14 @@ functino component({ value }) {
 ```tsx
 // 변경 전
 function component(props) {
-  <HeaderComponent hasPdding={props.hasPadding}>
-    <ChildComponent isDarkMode={props.isDrakMode} isLogin={props.isLogin} />
+  <HeaderComponent hasPadding={props.hasPadding}>
+    <ChildComponent isDarkMode={props.isDarkMode} isLogin={props.isLogin} />
   </HeaderComponent>;
 }
 
 // 변경 후
 function component({ hasPadding, ...props }) {
-  <HeaderComponent hasPdding>
+  <HeaderComponent hasPadding>
     <ChildComponent {...props} />
   </HeaderComponent>;
 }
@@ -117,13 +120,13 @@ function component({ hasPadding, ...props }) {
 
 ### ✍️ 내용
 
-ShortHand Props는언제 사용할까?
+**ShortHand Props는언제 사용할까?**
 
 - 토글링 값을 Props로 전달 할 때
 
 ```tsx
 function component({ hasPadding, ...props }) {
-	<HeaderComponent hasPdding>
+	<HeaderComponent hasPadding>
 		<ChildComponent {...props} />
 	</HeaderComponent>
 ```
@@ -131,6 +134,9 @@ function component({ hasPadding, ...props }) {
 ### ⭐️ 요약
 
 - ShortHand Props로 Props를 축약할 수 있다.
+
+<br />
+<br />
 
 # ✅ Single Quotes vs Double Quotes
 
