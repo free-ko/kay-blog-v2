@@ -179,7 +179,7 @@ function component({ hasPadding, ...props }) {
 
 ```tsx
 // ❌
-<ChilComponent
+<ChildComponent
 	class="mt-0"
 	Clean="code"
 	clean_code="react"
@@ -188,7 +188,7 @@ function component({ hasPadding, ...props }) {
 />
 
 // ✅
-<ChilComponent
+<ChildComponent
 	className="mt-0"
 	clean="code"
 	cleanCode="react"
@@ -208,7 +208,10 @@ function component({ hasPadding, ...props }) {
 - 무조건 true라면 `isShow={true}`가 아닌, `isShow`로 축약하기
 - 컴포넌트라면 대문자로 시작하기
 
-# ✅ 인라인 스타일 주의 하기
+<br />
+<br />
+
+# 6. 인라인 스타일 주의 하기
 
 ---
 
@@ -249,7 +252,10 @@ function InlineStyle(): Element {
 
 - JSX에서 인라인 스타일을 쓰려면 중괄호 안에 `camelCase key`를 가진 객체를 넣어야 한다.
 
-# ✅ CSS IN JS 인라인 스타일 지양하기
+<br />
+<br />
+
+# 7. CSS - in - JS 인라인 스타일 지양하기
 
 ---
 
@@ -263,7 +269,7 @@ function InlineStyle(): Element {
 			css`
 				background-color: white;
 				border: 1px solid #eee;
-				border-readius: 0.5rem;
+				border-radius: 0.5rem;
 				padding: 1rem;
 			`}
 		}>
@@ -319,13 +325,10 @@ export function Card({ title, children }) {
 
 ### ⭐️ 요약
 
-- CSS in JS 인라인 스타일을 지양해야 하는 이유
+- CSS in JS 인라인 스타일을 지양해야 하는 이유 - `성능 저하 발생 유발`, `휴먼 에러가 발생 가능성 존재`, `export 할 수 없음`
 
-  - 성능 저하를 일으킴
-  - 휴먼 에러가 발생할 수 있음
-  - export 할 수 없
-
-    음
+<br />
+<br />
 
 # ✅ 객체 Props 지양하기
 
