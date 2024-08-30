@@ -330,65 +330,72 @@ export function Card({ title, children }) {
 <br />
 <br />
 
-# ✅ 객체 Props 지양하기
+# 8. 객체 Props 지양하기
 
 ---
 
 ### ✍️ 내용
 
-- React는 JS로 개발되어 있음
+- 변하지 않는 값일 경우 컴포넌트 외부로 드러내기
+- 필요한 값만 객체를 분해해서 Props로 내려 준다.
+- 정말 값 비싼 연산, 너무 잦은 연산이 있을 경우 useMemo() 활용하여 계산된 값을 메모이제이션 한다.
+- Props 값을 나누어서 다른 컴포넌트에 Props를 전달한다.
 
-```tsx
-// 객체 Props 지양하기
-// - 변하지 않는 값일 경우 컴포넌트 외부로 드러내기
-// - 필요한 값만 객체를 분해해서 Props로 내려 준다.
-// - 정말 값 비싼 연산, 너무 잦은 연산이 있을 경우 useMemo() 활용하여 계산된 값을 메모이제이션 한다.
-// - Props 값을 나누어서 다른 컴포넌트에 Props를 전달한다.
-function SomeComponent() {
-  return (
-    <ChildComponent propObj={{ hello: 'world' }} propArr={['hello', 'hello']} />
-  );
-}
+  ```tsx
+  // ❌
+  function SomeComponent() {
+    return (
+      <ChildComponent
+        propObj={{ hello: 'world' }}
+        propArr={['hello', 'hello']}
+      />
+    );
+  }
 
-// ✅ 방법 1
-function SomeComponent() {
-  const [propArr, setPropArr] = useState(['hello', 'hello']);
+  // ✅ 방법 1
+  function SomeComponent() {
+    const [propArr, setPropArr] = useState(['hello', 'hello']);
 
-  return <ChildComponent hello1='world' hello2={propArr.at(0)} />;
-}
+    return <ChildComponent hello1='world' hello2={propArr.at(0)} />;
+  }
 
-// ✅ 방법 2
-function SomeComponent({ heavyState }) {
-  const [propArr, setPropArr] = useState(['hello', 'hello']);
-  const computedState = useMemo(
-    () => ({
-      heavyState: heavyState,
-    }),
-    [heavyState]
-  );
+  // ✅ 방법 2
+  function SomeComponent({ heavyState }) {
+    const [propArr, setPropArr] = useState(['hello', 'hello']);
 
-  return (
-    <ChildComponent
-      hello1='world'
-      hello2={propArr.at(0)}
-      computedState={computedState}
-    />
-  );
-}
+    const computedState = useMemo(
+      () => ({
+        heavyState: heavyState,
+      }),
+      [heavyState]
+    );
 
-// React의 Dependency 배열에 해당 Object.is 함수가 내장되어있음
-// 아래 결과 false
-Object.is(
-  { hello: 'world' }, // 초기 렌더링
-  { hello: 'world' } // 두번째 렌더링
-);
+    return (
+      <ChildComponent
+        hello1='world'
+        hello2={propArr.at(0)}
+        computedState={computedState}
+      />
+    );
+  }
+  ```
 
-// 아래 결과 false
-Object.is(
-  ['hello'], // 초기 렌더링
-  ['hello'] // 두번째 렌더링
-);
-```
+**React 리렌더링 되는 여부 판별**
+
+- React에서 `Object.is`는 컴포넌트의 props나 state가 변경되었는지 판단하는 데 사용됩니다. 이 함수는 두 값이 동일한 메모리 주소를 참조하는지를 확인합니다.
+
+1. 리렌더링과 `Object.is`
+   - React는 props나 state의 변경 여부를 `Object.is`로 판단합니다.
+   - 객체나 배열은 참조 타입이므로, 새로 생성된 객체나 배열은 이전과 다른 것으로 간주됩니다(비록 내용이 같아도).
+2. ❌ 컴포넌트의 문제점
+   - `{ hello: 'world' `}와 `['hello', 'hello']`는 컴포넌트가 렌더링될 때마다 새로 생성됩니다.
+   - React는 이 새로 생성된 값들이 이전 값과 다르다고 판단하여 ChildComponent를 리렌더링합니다.
+3. ✅ 방법 1 코드의 최적화
+   - 상태로 관리된 propArr는 렌더링 간에 동일한 참조를 유지합니다.
+   - React는 `Object.is`를 통해 props가 변하지 않았음을 인식하고, 컴포넌트의 불필요한 리렌더링을 방지합니다.
+
+<br />
+<br />
 
 # ✅ HTML Attribute 주의하기
 
