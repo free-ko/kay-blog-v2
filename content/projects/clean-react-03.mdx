@@ -110,13 +110,13 @@ published: true
 <br />
 <br />
 
-# ✅ Fragment 지양하기
+# 4. Fragment 지양하기
 
 ---
 
 ### 🌈 결론
 
-- 상황에 따라 불필요한 Fragmemt를 줄이자.
+- 상황에 따라 불필요한 Fragment를 줄이자.
 
 ### ✍️ 내용
 
@@ -144,7 +144,7 @@ function StringRender() {
 
 ```tsx
 // 렌더링 될 필요 없는 JSX 줄이기
-function ConditaionalRenderingEX() {
+function ConditionalRenderingEX() {
 	return(
 		<div>
 			<h1>{isLoggedIn ? 'User' : <></>}</h1>
@@ -160,7 +160,10 @@ function ConditaionalRenderingEX() {
 
 - 불필요한 Fragment 사용을 줄이자.
 
-# ✅ 알아두면 좋은 컴포넌트 네이밍
+<br />
+<br />
+
+# 5. 알아두면 좋은 컴포넌트 네이밍
 
 ---
 
@@ -185,15 +188,18 @@ function ComponentNaming() {
 
 ### 컴포넌트 네이밍
 
-- 일반적으로 컴포넌트 PascalCase
-- 기본 HTML 요소는 lower case
+- 일반적으로 컴포넌트 `PascalCase`
+- 기본 HTML 요소는 `lower case`
 - route based file name
-  - `componet-naimng.jsx` ⇒ `<ComponentNaimng />`
-  - `component-namaing/index.jsx` ⇒ `<ComponentNaimng />`
+  - `component-naming.jsx` ⇒ `<ComponentNaming />`
+  - `component-naming/index.jsx` ⇒ `<ComponentNaming />`
 
 ### ⭐️ 요약
 
 - 컴포넌트 네이밍 규칙을 이해하고 사용하자
+
+<br />
+<br />
 
 # ✅ JSX 컴포넌트 함수로 반환
 
