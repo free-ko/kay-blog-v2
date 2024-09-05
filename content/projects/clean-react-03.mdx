@@ -201,7 +201,7 @@ function ComponentNaming() {
 <br />
 <br />
 
-# ✅ JSX 컴포넌트 함수로 반환
+# 6. JSX 컴포넌트 함수로 반환
 
 ---
 
@@ -213,19 +213,12 @@ return (
   <div>
     {TopRender()}
     <TopRender />
-    {rednerMain()}
+    {renderMain()}
   </div>
 );
 ```
 
 ### ✍️ 내용
-
-- JSX 컴포넌트 함수로 반환시 문제점
-  - 스코프가 꼬임
-  - 언제 어떻게 쓰일지 몰라서 위험
-  - 컴파일 과정에서 캐치 못하면 치명적인 오류 발생
-  - 리턴 값이 무엇인지 파악하기 어려움
-  - props 넣기가 힘듦
 
 ```tsx
 function ReturnJSXFunction() {
@@ -237,7 +230,7 @@ function ReturnJSXFunction() {
     );
   };
 
-  const rednerMain = () => {
+  const renderMain = () => {
     return (
       <main>
         <p>Clean Code</p>
@@ -248,11 +241,19 @@ function ReturnJSXFunction() {
   return (
     <div>
       {TopRender()}
-      {rednerMain()}
+      {renderMain()}
     </div>
   );
 }
 ```
+
+**JSX 컴포넌트 함수로 반환시 문제점**
+
+- 스코프가 꼬임
+- 언제 어떻게 쓰일지 몰라서 위험
+- 컴파일 과정에서 캐치 못하면 치명적인 오류 발생
+- 리턴 값이 무엇인지 파악하기 어려움
+- props 넣기가 힘듦
 
 ### ⭐️ 요약
 
@@ -261,7 +262,10 @@ function ReturnJSXFunction() {
   - 반환 값을 바로 알기 어려움
   - props 전달 등 일반적인 패턴이 아님
 
-# ✅ 컴포넌트 내부에 컴포넌트 선언
+<br />
+<br />
+
+# 7. 컴포넌트 내부에 컴포넌트 선언
 
 ---
 
@@ -297,16 +301,20 @@ function OuterComponent() {
 
 ### ✍️ 내용
 
-- 컴포넌트 내부에 컴포넌트 선언시 문제점
-  1. 결합도가 증가함
-     - 구조적으로 스코프적으로 종속된 개발이 됨
-     - 나중에 확장성이 생겨서 분리될 때 굉장히 힘듦
-  2. 성능 저하
-     - 상위 컴포넌트 리렌더 일어나면 ⇒ 하위 컴포넌트 재 생성
+**컴포넌트 내부에 컴포넌트 선언시 문제점**
+
+1. 결합도가 증가함
+   - 구조적으로 스코프적으로 종속된 개발이 됨
+   - 나중에 확장성이 생겨서 분리될 때 굉장히 힘듦
+2. 성능 저하
+   - 상위 컴포넌트 리렌더 일어나면 ⇒ 하위 컴포넌트 재 생성
 
 ### ⭐️ 요약
 
 - 컴포넌트 내부에 컴포넌트를 선언하면 결합도가 증가하고 성능이 저하될 수 있다.
+
+<br />
+<br />
 
 # ✅ DisplayName
 
