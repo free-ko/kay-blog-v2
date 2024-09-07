@@ -379,13 +379,13 @@ const withRouter = (Component) => {
 <br />
 <br />
 
-# ✅ Component 구성하기
+# 9. Component 구성하기
 
 ---
 
 ### 🌈 결론
 
-- 개발을 할 때, 어떤 순서 및 흐름으로 개발을 진행해야 함
+- 개발 진행 시, 어떤 순서 및 흐름으로 설계 하는 것은 중요함.
 
 ### ✍️ 내용
 
@@ -395,9 +395,7 @@ const DEFAULT_COUNT = 100;
 const DEFAULT_DELAY = 500;
 
 // ✅ 타입 또는 인터페이스도 컴포넌트 밖으로 빼기
-interface SomeComponentProps {
-
-}
+interface SomeComponentProps {}
 
 // ✅ 컴포넌트와 관련없는 로직은 컴포넌트 외부로 빼기
 const handleClose = () => {
@@ -405,7 +403,7 @@ const handleClose = () => {
 	// Local Storage
 }
 
-const SomeComponent = ({ prop1, prop2 }: SomeCompoentProps) => {
+const SomeComponent = ({ prop1, prop2 }: SomeComponentProps) => {
 	// ✅ flag 또는 ref는 상단에 표시
 	let isHold = false;
 	const ref = useRef(null);
@@ -423,12 +421,12 @@ const SomeComponent = ({ prop1, prop2 }: SomeCompoentProps) => {
 
 	const onClose = () => handleClose();
 
-	// Early Return JSX
+	// ✅ Early Return JSX
 	if (isHold) {
 		return <div>데이터가 존재하지 않습니다.</div>
 	}
 
-	// ✅ Main JSX와 가장 가까운 곳에 위치
+	// ✅ useEffect 사용시, Main JSX와 가장 가까운 곳에 위치
 	// - 최소 1개로 사용할 수 있도록 진행
 	useEffect(() => {
 	}, []);
@@ -436,7 +434,7 @@ const SomeComponent = ({ prop1, prop2 }: SomeCompoentProps) => {
 	// ✅ JSX 반환은 항상 사전에 개행을 동반
 	return (
 		<div className="tooltip">
-			<div className="msg">Hellow World</div>
+			<div className="msg">Hello World</div>
 			<button
 				className="close"
 				type="button"
@@ -463,7 +461,7 @@ export default SomeComponent;
 
 ### ⭐️ 요약
 
-- 개발을 할 때 규칙을 가지고 개발을 진행하자.
+- 개발을 할 때 규칙을 가지고 개발을 진행하자.(컨벤션 설정)
 
 <br />
 
