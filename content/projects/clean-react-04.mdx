@@ -1,0 +1,39 @@
+---
+title: 'Clean React 04 - Rendering'
+date: '2024-09-09 07:25:00'
+description: Rendering에 대해 자세히 알아보자.
+published: true
+---
+
+# 1. JSX에서의 공백 처리
+
+```tsx
+// ❌
+export default function App() {
+  return (
+    <div>
+      Welcome Clean Code&nbsp;
+      <a href='clean-code-js'>Go Clean Code</a>
+    </div>
+  );
+}
+
+// ✅
+export default function App() {
+  return (
+    <div>
+      Welcome Clean Code <a href='clean-code-js'>Go Clean Code</a>
+    </div>
+  );
+}
+```
+
+- JSX에서 공백 처리는 가독성과 유지보수성을 위해 중요한데, `&nbsp;` 같은 HTML 엔터티는 복잡성을 증가시킴.
+- 대신 문자열 사이에 자연스럽게 공백을 넣는 것이 더 나은 방식.
+- 만약 여러 줄에 걸친 텍스트에서 공백을 조정해야 한다면, CSS로 `margin`이나 `padding`을 사용하는 것도 하나의 방법
+
+<br />
+
+### 참고
+
+- [클린코드 리액트](https://www.udemy.com/course/clean-code-react/)
