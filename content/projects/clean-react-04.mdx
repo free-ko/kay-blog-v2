@@ -35,7 +35,7 @@ export default function App() {
 <br />
 <br />
 
-# 2. 0는 JSX에서 유효한 값
+# 2. '0'값은 JSX에서 유효한 값
 
 ---
 
@@ -82,14 +82,14 @@ export default function App() {
 <br />
 <br />
 
-# ✅ List 내부에서 Key
+# 3. List 내부에서 Key
 
 ---
 
 ### 🌈 결론
 
 ```tsx
-export default functino App({ list }) {
+export default function App({ list }) {
 	const handleAddItem = (value) => {
 		setItems((prev) => [
 			...prev,
@@ -165,21 +165,23 @@ export default functino App({ list }) {
 
 ### ✍️ 내용
 
-- List 컴포넌트를 만들 때, key props를 넣어야 함.
-- 이 때, key는 고유한 값이여야 함
-- 단, 동적으로 생성되는 즉, 렌더링마다 생성되는 key를 넣으면 안됨
+- List 컴포넌트를 만들 때, key props를 넣어야 추후, 리렌더링시, DOM업데이트 여부 판단 가능
+- 이 때, key는 고유한 값이여야 함(단, 동적으로 생성되는 즉, 렌더링마다 생성되는 key를 넣으면 안됨)
 
 ### ⭐️ 요약
 
 - List 컴포넌트를 작성할 때, 고유한 key를 props로 전달하자.
 
-# ✅ 안전하게 Raw HTML 다루기
+<br />
+<br />
+
+# 4. 안전하게 Raw HTML 다루기
 
 ---
 
 ### 🌈 결론
 
-- React 에서 HTML과 악성 스크립트를 심을 수 있는 경우를 아래의 방법으로 대처하자
+- React 에서 HTML과 악성 스크립트를 심을 수 있는 경우를 아래의 방법으로 대처하자.
   - https://github.com/cure53/DOMPurify
   - HTML Sanitizer API
   - eslint-plugin-risxss
