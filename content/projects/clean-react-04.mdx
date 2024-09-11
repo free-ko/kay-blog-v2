@@ -181,56 +181,66 @@ export default function App({ list }) {
 
 ### 🌈 결론
 
-- React 에서 HTML과 악성 스크립트를 심을 수 있는 경우를 아래의 방법으로 대처하자.
-  - https://github.com/cure53/DOMPurify
-  - HTML Sanitizer API
-  - eslint-plugin-risxss
+React 에서 HTML과 악성 스크립트를 심을 수 있는 경우를 대비해 아래의 방법으로 대처하자.
+
+- [DOMPurify](https://github.com/cure53/DOMPurify), [HTML Sanitizer API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API), [eslint-plugin-risxss](https://www.npmjs.com/package/eslint-plugin-risxss?activeTab=readme)
 
 ### ✍️ 내용
 
-안전하게 Raw HTML 다루기
-
-- 렌더링될 데이터
-- 유저가 다시 한번 입력모드로 수정할 수 있는 데이터
-  - 바로 input, textarea
-  - https://github.com/cure53/DOMPurify
-  - HTML Sanitizer API
-    - https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API
-  - eslint-plugin-risxss
-    - https://www.npmjs.com/package/eslint-plugin-risxss?activeTab=readme
+React에서 Raw HTML을 다룰 때 XSS(악성 스크립트 공격)로부터 보호하는 것이 매우 중요. 이를 위해 다음과 같은 방법을 사용할 수 있음.
 
 ```tsx
-const SERVER_DATA = '<p>some raw html</p>'
+import DOMPurify from 'dompurify';
+
+const SERVER_DATA = '<p>some raw html</p>';
 
 function DangerouslySetInnerHTMLExample() {
-	const post = {
+  const post = {
+    // 🔥 XSS(악성 스크립트 공격) 예시
+    content: `<img src="" onerror='alert("you were hacked")'>`,
+  };
 
-		// XSS(악성 스크립트 공격)
-		content: `<img src="" onerror='alert("you were hacked")'>`
-	};
+  // HTML 데이터의 정제를 위해 DOMPurify 사용
+  const sanitizeContent = { __html: DOMPurify.sanitize(SERVER_DATA) };
 
-	const markup = { __html: SERVER_DATA }
+  // ❌ XSS에 매우 취약한 방법
+  // return <div>{markup}</div>;
 
-	// DOMPurify 사용
-	const sanitizeContent = { __html: DOMPurify.sanitize(SERVER_DATA) };
-	setContentHTML(DOMPurify.sanitize(SERVER_DATA))
-
-	// ❌ 하지만 아래 것이 더 위험
-	return <div>{markup}</div>;
-
-	return <textarea>{수정할 수 있는 유저 컨텐츠를 넣으려면...?}</textarea>
-
-	// ✅ 아래가 그나마 괜찮음
-	return <textarea>{contentHTML}</textarea>
-
-	// 🤔 이것도 위험
-	return <div dangeroulySetInnerHTML={markup} />;
-
-
-	// 훨씬 안전하게 사용하는 방법
-	return <div>{sanitizeContent}</div>;
+  // ✅ DOMPurify로 정제한 데이터를 사용하는 방법 (안전)
+  return <div dangerouslySetInnerHTML={sanitizeContent} />;
 }
 ```
+
+### 유저가 수정할 수 있는 콘텐츠
+
+유저가 입력하거나 수정할 수 있는 데이터(예: input, textarea)에서 악성 스크립트가 실행되는 것을 방지해야 함. 유저 입력 데이터를 처리할 때는 항상 정제 과정을 거치고, HTML 태그가 아니라 순수 문자열로 저장하도록 주의해야 함.
+
+```tsx
+function UserContentInput() {
+  const [userContent, setUserContent] = useState('');
+
+  return (
+    <textarea
+      value={DOMPurify.sanitize(userContent)}
+      onChange={(e) => setUserContent(DOMPurify.sanitize(e.target.value))}
+    />
+  );
+}
+```
+
+### 사용 가능한 도구들
+
+1. `DOMPurify`
+
+   - DOMPurify는 HTML을 정제해 XSS 공격을 방지하는 인기 있는 라이브러리이다. 사용법이 간단하고 다양한 옵션을 제공한다.
+
+2. `HTML Sanitizer API`
+
+   - HTML Sanitizer API는 웹 표준으로 제안된 기능이며, HTML을 안전하게 정제할 수 있지만, 현재 지원하는 브라우저가 제한적이다. 실험적인 기능이므로 현재는 DOMPurify와 같은 라이브러리와 병행하여 사용하는 것이 좋다.
+
+3. `eslint-plugin-risxss`
+
+   - ESLint 플러그인은 코드 작성 중에 발생할 수 있는 XSS 취약점을 감지하고 경고해주는 도구이다. 프로젝트의 보안을 강화할 수 있는 유용한 도구이다.
 
 ### ⭐️ 요약
 
