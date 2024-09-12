@@ -1,0 +1,265 @@
+---
+title: 'Clean React 05 - Hooks'
+date: '2024-09-13 07:27:00'
+description: Hook에 대해 자세히 알아보자.
+published: true
+---
+
+# 1. Hooks API
+
+---
+
+### 🌈 결론
+
+- Hook이 왜 생겨났는지 알고 쓰자
+
+### ✍️ 내용
+
+- 왜 Hooks API가 생겨났나?
+
+### HOC
+
+- 컴포넌트 로직을 재 사용하기 위한 React 고급 기술
+- 고차 컴포넌트(HOC)는 React API의 일부가 아니며, React의 구성적 특성에서 나오는 패턴
+
+  ```tsx
+  const EnhancedComponent = higherOrderComponent(WrappedComponent);
+
+  // 사용
+  export default connect(mapStateToProps, mapDispatchToProps)(TodoApp);
+  ```
+
+### Render Props
+
+- React 컴포넌트 간에 코드를 공유하기 위해 함수 props를 이용하는 간단한 기술
+- 구현된 컴포넌트는 자체적으로 렌더링 로직을 구현하는 대신, React 엘리먼트 요소를 반환하고 이를 호출하는 함수를 사용
+  ```tsx
+  <DataProvider render={(data) => <h1>Hello {data.target}</h1>} />
+  ```
+
+### SFC
+
+```tsx
+class ClassComponent extends React.Component {
+	render() {
+		return <div>{this.props.name}</div>
+	}
+}
+
+vs
+
+const STatelessComponent = props = > <div>{props.name}</div>;
+```
+
+### 정리
+
+- Hook 사용 방법
+
+  ```tsx
+  import React, { useState, useEffect } from 'react';
+
+  function Example() {
+  	// State 관리 영역
+  	const [count, setCount] = useState(0);
+
+  	// State가 변했을 때, 추가 렌더링 작업 영역
+  	// componentDidMount, componentDidUpdate와 비슷
+  	useEffect((
+  		document.title = `You clicked ${count} times`;
+  	) => {}, [])
+
+  	return (
+  		<div>
+  			<p>You clicked {count} times</p>
+  			<button onClick={() => setCount(count + 1)}>
+  				Click me
+  			</button>
+  		</div>
+  	);
+  }
+  ```
+
+### ⭐️ 요약
+
+- Hook 생긴 이유와 그 과정을 알 때, 왜 Hook을 사용하는지 알 수 있음
+
+# ✅ useEffect() 기명함수와 함께 사용하기
+
+---
+
+### 🌈 결론
+
+- `useEffect` 에러 파악할 때, 기명함수 사용하면 파악하기 쉬움
+
+### ✍️ 내용
+
+1. `useEffect` 안전하게 사용하기
+   - 에러 파악 cf) console.log, report, monitoring, React Devtools
+   - 기명함수로 넘기면 로그에 기명함수로 찍히기 때문에 에러 파악이 용이함
+
+```tsx
+// 기명함수로 가용하기
+useEffect(function isInViewSomeComponent() {
+	// some logic
+}, [isInView]);
+
+useEffect(function onPopState() {
+	if(navigationType === 'POP') {
+		// some logic
+	}
+}, [isInView]);
+
+useEffect(function onInit(){
+	// some logic
+});
+
+useEffect(function addEvent() {
+	document.addEventListenr();
+
+	return functino removeEvent() {
+		document.removeEventListener();
+	}
+}, [])
+```
+
+### ⭐️ 요약
+
+- 기명함수를 잘 사용해서 에러 파악 및 코드 파악을 용이하게 하자
+
+# ✅ 한 가지 역할만 수행하는 useEffect
+
+---
+
+### 🌈 결론
+
+- `useEffect` 를 작성할 때, 한가지의 역할을 할 수 있도록 작성하자.
+
+### ✍️ 내용
+
+- SRP - 단일책임 원칙
+  - 하나의 역할만 수행하는 무언가를 만들자 ⇒ `useEffect()`
+  - 확인 하는 방법
+    - 기명 함수를 작성해보자
+    - Dependency Arrays가 너무 많은 관찰 대상이 들어가고 있는게 아닌지 확인
+
+```tsx
+function LoginPage({ token, newPath }) {
+  // ❌ 위험
+  useEffect(() => {
+    redirect(newPath);
+
+    const userInfo = setLogin(token);
+    // ... 로그인 로직
+  }, [token, newPath]);
+
+  // ✅ 분리
+
+  useEffect(() => {
+    redirect(newPath);
+  }, [newPath]);
+
+  useEffect(() => {
+    const userInfo = setLogin(token);
+    // ... 로그인 로직
+
+    if (options) {
+      // 부가적인 로직 <= 추가 동작해도 이상이 없고 부작용이 생길 일이 업을 경우
+    }
+  }, [token, options]);
+}
+```
+
+### ⭐️ 요약
+
+- `useEffect` 를 사용할 때, 한 가지 역할만 할 수 있도록 작성하자.
+
+# ✅ Custom Hook 반환의 종류
+
+---
+
+### 🌈 결론
+
+- React에서 제공하는 컨벤션에 맞게 Custom Hook을 사용하자
+
+### ✍️ 내용
+
+1. Custom Hook 사용시 지켜야 할 규칙들
+
+   ```tsx
+   function ReturnCustomHooks() {
+   	// ❌
+   	const [setValue, value] = useSomeHooks(true);
+
+   	// ✅
+   	const [value, setValue] = useSomeHooks(true);
+
+
+   	// ❌
+   	const [oneValue] = useSomeHooks();
+
+     // ✅
+   	const oneValue = useSomeHooks();
+
+
+   	// ❌
+   	constt [firstValue, secondValue, _, thirdValue] = useSomeHooks(true);
+
+     // ✅
+     const { firstValue, secondValue, rest} = useSomeHooks(true)
+
+
+   	// ❌
+   	const query = useQuery({ queryKey: ['hello', queryFn: getHello })
+   	const data = query.data;
+   	const refetch = query.refetch;
+   	const isSuccess = query.isSuccess
+
+   	// ✅
+     const { data, refetch, isSuccess } = useQuery({ queryKey: ['hello', queryFn: getHello })
+   }
+   ```
+
+### ⭐️ 요약
+
+- Custom Hook을 사용할 때, 일관된 컨벤션을 작성하자.
+
+# ✅ useEffect 내부의 비동기 함수
+
+---
+
+### 🌈 결론
+
+- `useEffect` 사용시 Promise 값을 리턴하는 비동기 함수 사용시 주의하자
+
+### ✍️ 내용
+
+1. `useEffect` 내부에서 비동기 함수 처리
+
+   ```tsx
+   // ❌
+   // useEffect 리턴 값은 undefined이거나 clean function임
+   useEffect(async () => {
+     // 비동기 작업
+     const result = await fetchData();
+   }, []);
+
+   // ✅
+   useEffect(async () => {
+     // 비동기 작업
+     const fetchData = async () => {
+       const result = await someFetch();
+     };
+
+     fetchData();
+   }, []);
+   ```
+
+### ⭐️ 요약
+
+- `useEffect` 내부에서 비동기 함수를 사용하는 것이 아닌, 커스텀 훅이나, 다른 곳에서 사용할 수 있도록 하자
+
+<br />
+
+### 참고
+
+- [클린코드 리액트](https://www.udemy.com/course/clean-code-react/)
