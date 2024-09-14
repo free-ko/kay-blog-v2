@@ -15,73 +15,123 @@ published: true
 
 ### ✍️ 내용
 
-- 왜 Hooks API가 생겨났나?
+### 1. Hooks API 도입 배경
 
-### HOC
+**1.1 기존 패턴들의 한계**
 
-- 컴포넌트 로직을 재 사용하기 위한 React 고급 기술
-- 고차 컴포넌트(HOC)는 React API의 일부가 아니며, React의 구성적 특성에서 나오는 패턴
+- React에서는 `HOC(고차 컴포넌트)`, `Render Props`, 그리고 `클래스 컴포넌트(SFC) 패턴`을 사용하여 컴포넌트 로직을 재사용하거나 상태 관리를 해왔습니다. 하지만 이러한 패턴들에는 몇 가지 문제점이 있었습니다.
+
+- `HOC`의 단점
+
+  - 깊은 컴포넌트 트리(Wrapper Hell): 여러 HOC가 중첩되면 코드가 복잡해지고 디버깅이 어려워집니다.
+  - 코드 가독성 저하: 로직을 이해하기 어려워지며, 코드가 장황해질 수 있습니다.
+
+- `Render Props`의 단점
+
+  - Prop Drilling: 여러 컴포넌트에 걸쳐 props를 전달해야 할 때, 중첩된 구조로 인해 관리가 힘들어집니다.
+  - 가독성 문제: 함수 형태로 props를 전달하는 방식이 때때로 복잡하고 헷갈릴 수 있습니다.
+
+- `클래스 컴포넌트`의 단점
+
+  - 상태 관리의 복잡성: this 키워드를 사용해야 하는 불편함, 그리고 state와 lifecycle 메서드를 나눠서 관리하는 불편함이 있었습니다.
+
+**1.2. Hooks의 등장**
+
+- React 팀은 이러한 복잡함을 줄이고, 더 직관적인 상태 관리와 사이드 이펙트 관리 방법을 제공하기 위해 Hooks API를 도입했습니다.
+
+### 2. 기존 패턴들과 Hooks 비교
+
+**2.1. HOC(Higher-Order Component)**
+
+- 기능: 컴포넌트를 감싸서 새로운 기능을 추가하는 패턴.
+- 문제점: HOC의 중첩은 코드 가독성을 떨어뜨리고, 컴포넌트 계층이 깊어지면서 디버깅이 어려워집니다.
 
   ```tsx
+  // HOC는 여전히 유용할 수 있지만, 중복 로직이 많고 트리 구조가 복잡해질 수 있습니다.
   const EnhancedComponent = higherOrderComponent(WrappedComponent);
-
-  // 사용
   export default connect(mapStateToProps, mapDispatchToProps)(TodoApp);
   ```
 
-### Render Props
+**2.2 Render Props**
 
-- React 컴포넌트 간에 코드를 공유하기 위해 함수 props를 이용하는 간단한 기술
-- 구현된 컴포넌트는 자체적으로 렌더링 로직을 구현하는 대신, React 엘리먼트 요소를 반환하고 이를 호출하는 함수를 사용
+- 기능: 컴포넌트가 함수형 props를 통해 자식에게 렌더링 로직을 전달하는 패턴.
+- 문제점: 중첩된 함수 호출이 많아지면 가독성이 떨어집니다.
+
   ```tsx
   <DataProvider render={(data) => <h1>Hello {data.target}</h1>} />
   ```
 
-### SFC
+**2.3. 클래스 컴포넌트와 SFC(Stateless Functional Component)**
 
-```tsx
-class ClassComponent extends React.Component {
-	render() {
-		return <div>{this.props.name}</div>
-	}
-}
-
-vs
-
-const STatelessComponent = props = > <div>{props.name}</div>;
-```
-
-### 정리
-
-- Hook 사용 방법
+- 클래스 컴포넌트는 this를 관리해야 하고, state와 라이프사이클 메서드를 분리해서 사용해야 하는 복잡함이 있었습니다.
 
   ```tsx
-  import React, { useState, useEffect } from 'react';
-
-  function Example() {
-  	// State 관리 영역
-  	const [count, setCount] = useState(0);
-
-  	// State가 변했을 때, 추가 렌더링 작업 영역
-  	// componentDidMount, componentDidUpdate와 비슷
-  	useEffect((
-  		document.title = `You clicked ${count} times`;
-  	) => {}, [])
-
-  	return (
-  		<div>
-  			<p>You clicked {count} times</p>
-  			<button onClick={() => setCount(count + 1)}>
-  				Click me
-  			</button>
-  		</div>
-  	);
+  class ClassComponent extends React.Component {
+    render() {
+      return <div>{this.props.name}</div>;
+    }
   }
   ```
 
+- SFC는 상대적으로 간단하지만, 상태 관리와 사이드 이펙트 관리에 한계가 있었습니다.
+
+      ```tsx
+      const StatelessComponent = (props) => <div>{props.name}</div>;
+      ```
+
+### 3. Hooks의 핵심 개념
+
+**3.1 `useState`**
+
+- 함수형 컴포넌트에서 상태를 관리할 수 있게 해줍니다.
+
+      ```tsx
+      const [state, setState] = useState(initialState);
+      ```
+
+**3.2. `useEffect`**
+
+- 사이드 이펙트(예: 데이터 가져오기, DOM 업데이트)를 처리합니다. 클래스 컴포넌트의 componentDidMount, componentDidUpdate와 비슷한 역할을 합니다.
+
+      ```tsx
+      useEffect(() => {
+        document.title = `You clicked ${count} times`;
+      }, [count]); // count가 변경될 때마다 실행
+      ```
+
+**3.3. 그 외 주요 Hooks**
+
+- `useContext`: Context API와 함께 상태를 쉽게 공유.
+- `useReducer`: 복잡한 상태 로직을 간결하게 처리.
+- `useMemo`, `useCallback`: 성능 최적화를 위한 메모이제이션 제공.
+
+### 4. Hooks가 제공하는 이점
+
+**4.1. 코드 간결화**
+
+- 함수형 컴포넌트에서도 상태와 라이프사이클 관리가 가능하여, 클래스형 컴포넌트에서의 복잡한 코드가 많이 줄어듭니다.
+
+**4.2. 로직 재사용**
+
+- HOC나 Render Props 없이도 여러 컴포넌트에서 로직을 쉽게 공유할 수 있습니다. 커스텀 Hook을 만들어 재사용할 수 있습니다.
+
+  ```tsx
+  function useCustomHook() {
+    // 커스텀 로직
+  }
+  ```
+
+**4.3. 더 나은 가독성**
+
+- 함수형 컴포넌트에 로직을 분리해서 작성할 수 있기 때문에, 코드 가독성이 높아집니다.
+
 ### ⭐️ 요약
 
-- Hook 생긴 이유와 그 과정을 알 때, 왜 Hook을 사용하는지 알 수 있음
+- Hooks는 기존의 HOC, Render Props, 클래스 컴포넌트의 복잡성을 해결하기 위해 도입되었습니다.
+- Hooks를 사용하면 코드가 간결해지고, 재사용 가능한 로직을 쉽게 만들 수 있으며, 함수형 컴포넌트에서 상태와 사이드 이펙트를 관리할 수 있습니다.
+
+<br />
+<br />
 
 # ✅ useEffect() 기명함수와 함께 사용하기
 
