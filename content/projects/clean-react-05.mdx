@@ -297,55 +297,90 @@ function LoginPage({ token, newPath, options }) {
 <br />
 <br />
 
-# ✅ Custom Hook 반환의 종류
+# 4. Custom Hook 반환의 종류
 
 ---
 
 ### 🌈 결론
 
-- React에서 제공하는 컨벤션에 맞게 Custom Hook을 사용하자
+- React에서 제공하는 컨벤션에 맞게 `Custom Hook`을 사용하자.
+- 올바른 네이밍과 구조를 통해 `Custom Hook`의 반환값을 잘 정리하고, 협업 및 유지보수에 용이하게 하자.
 
 ### ✍️ 내용
 
-1. Custom Hook 사용시 지켜야 할 규칙들
+### Custom Hook 사용시 지켜야 할 규칙들
 
-   ```tsx
-   function ReturnCustomHooks() {
-   	// ❌
-   	const [setValue, value] = useSomeHooks(true);
+**1. 반환값 순서 지키기**
 
-   	// ✅
-   	const [value, setValue] = useSomeHooks(true);
+- `Custom Hook`에서 배열을 반환할 때, `value`가 먼저 오고, `setter` 함수가 그 뒤에 오는 것이 컨벤션입니다.
 
+  ```tsx
+  function ReturnCustomHooks() {
+    // ❌ 잘못된 순서로 반환
+    const [setValue, value] = useSomeHooks(true);
 
-   	// ❌
-   	const [oneValue] = useSomeHooks();
+    // ✅ 올바른 순서로 반환
+    const [value, setValue] = useSomeHooks(true);
+  }
+  ```
 
-     // ✅
-   	const oneValue = useSomeHooks();
+**2. 불필요한 배열 비구조화 할당 피하기**
 
+- `Custom Hook`이 단일 값을 반환할 때는, 굳이 배열 비구조화 할당을 사용할 필요가 없습니다. 단일 값을 바로 할당하는 것이 더 간결하고 명확합니다.
 
-   	// ❌
-   	constt [firstValue, secondValue, _, thirdValue] = useSomeHooks(true);
+  ```tsx
+  function ReturnCustomHooks() {
+    // ❌ 불필요한 배열 비구조화 할당
+    const [oneValue] = useSomeHooks();
 
-     // ✅
-     const { firstValue, secondValue, rest} = useSomeHooks(true)
+    // ✅ 단일 값 직접 할당
+    const oneValue = useSomeHooks();
+  }
+  ```
 
+**3. 비구조화 할당 시 변수명 명확히 하기**
 
-   	// ❌
-   	const query = useQuery({ queryKey: ['hello', queryFn: getHello })
-   	const data = query.data;
-   	const refetch = query.refetch;
-   	const isSuccess = query.isSuccess
+- 불필요한 값을 무시하거나 네이밍을 엉성하게 할 경우 코드 가독성이 떨어집니다. 특히, 여러 개의 값을 반환하는 경우는 객체 형태로 반환하는 것이 좋습니다.
 
-   	// ✅
-     const { data, refetch, isSuccess } = useQuery({ queryKey: ['hello', queryFn: getHello })
-   }
-   ```
+  ```tsx
+  function ReturnCustomHooks() {
+    // ❌ 불필요한 언더스코어로 변수 무시
+    const [firstValue, secondValue, _, thirdValue] = useSomeHooks(true);
+
+    // ✅ 객체 형태로 반환
+    const { firstValue, secondValue, rest } = useSomeHooks(true);
+  }
+  ```
+
+**4. Query 함수와 같은 Hook 사용 시 비구조화 할당 적극 활용하기**
+
+- 예를 들어, `React Query`와 같은 라이브러리의 훅에서 반환된 값들을 여러 줄로 나누는 것보다, 비구조화 할당을 통해 한 줄로 처리하는 것이 훨씬 깔끔하고 효율적입니다.
+
+      ```tsx
+      function ReturnCustomHooks() {
+        // ❌ 여러 줄로 나누어 할당
+        const query = useQuery({ queryKey: ['hello'], queryFn: getHello });
+        const data = query.data;
+        const refetch = query.refetch;
+        const isSuccess = query.isSuccess;
+
+        // ✅ 비구조화 할당으로 간결하게 처리
+        const { data, refetch, isSuccess } = useQuery({
+          queryKey: ['hello'],
+          queryFn: getHello,
+        });
+      }
+      ```
 
 ### ⭐️ 요약
 
-- Custom Hook을 사용할 때, 일관된 컨벤션을 작성하자.
+- 배열 반환 시 순서 유지: value가 먼저, setter 함수가 뒤에 오도록 하자.
+- 단일 값은 배열 대신 직접 할당: 불필요한 배열 비구조화 할당을 피하자.
+- 여러 값 반환 시 객체 사용: 필요 없는 값을 무시하기보다는 객체 형태로 반환해 가독성 유지 하자
+- 비구조화 할당 적극 활용: query 함수 등 여러 값을 반환하는 훅에서는 비구조화 할당으로 코드를 간결하게 하자.
+
+<br />
+<br />
 
 # ✅ useEffect 내부의 비동기 함수
 
