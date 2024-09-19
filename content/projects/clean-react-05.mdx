@@ -382,40 +382,117 @@ function LoginPage({ token, newPath, options }) {
 <br />
 <br />
 
-# ✅ useEffect 내부의 비동기 함수
+# 5. useEffect 내부의 비동기 함수
 
 ---
 
 ### 🌈 결론
 
-- `useEffect` 사용시 Promise 값을 리턴하는 비동기 함수 사용시 주의하자
+- `useEffect` 내부에서는 비동기 함수를 직접 실행하는 것이 아닌, 비동기 함수를 명시적으로 선언하고 호출하는 방식으로 처리하는 것이 좋다.
 
 ### ✍️ 내용
 
-1. `useEffect` 내부에서 비동기 함수 처리
+**1. `useEffect` 내부에서 비동기 함수 처리**
 
-   ```tsx
-   // ❌
-   // useEffect 리턴 값은 undefined이거나 clean function임
-   useEffect(async () => {
-     // 비동기 작업
-     const result = await fetchData();
-   }, []);
+- `useEffect`는 비동기 함수를 리턴하지 못한다. 즉, `useEffect`에서 바로 `async` 키워드를 사용할 수 없기 때문에, 비동기 함수 호출을 적절히 처리하는 방법을 이해하는 것이 중요하다.
 
-   // ✅
-   useEffect(async () => {
-     // 비동기 작업
-     const fetchData = async () => {
-       const result = await someFetch();
-     };
+  ```tsx
+  // ❌ 잘못된 예시
+  useEffect(async () => {
+    const result = await fetchData();
+    console.log(result);
+  }, []);
+  ```
 
-     fetchData();
-   }, []);
-   ```
+  - 위와 같이 `useEffect`에 바로 `async` 함수를 사용할 수 없는데, 이는 `useEffect`가 반환하는 값은 클린업 함수(clean-up function)이어야 하거나 아무것도 반환하지 않아야 하기 때문이다. 하지만 `async` 함수는 항상 `Promise`를 반환하기 때문에 문제가 발생한다
+
+**2. 비동기 함수 선언 후 호출하기**
+
+- `useEffect` 내부에서는 `async` 함수를 따로 선언하고 그 함수를 호출하는 방식으로 비동기 처리를 할 수 있다.
+
+  ```tsx
+  // ✅ 올바른 예시
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await someFetch();
+        console.log(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  ```
+
+  - 핵심 포인트: `useEffect` 안에서 비동기 처리를 위해서는 `async` 함수를 선언하고 그 함수 안에서 `await` 처리를 해야 한다. 이렇게 하면 `useEffect`는 `Promise`를 반환하지 않고, 내부에서 비동기 로직이 적절히 처리된다.
+  - 에러 핸들링: 비동기 함수 내에서 에러가 발생할 수 있으므로, `try-catch` 블록을 활용해 에러 처리를 해주는 것이 중요하다.
+
+**3. 클린업 함수와 비동기 처리**
+
+- 만약 비동기 작업이 컴포넌트가 언마운트되거나 의존성 배열의 값이 변경될 때 중단되어야 한다면, 클린업 함수를 사용해 이를 처리할 수 있다.
+
+  ```tsx
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchData = async () => {
+      try {
+        const result = await someFetch();
+        if (!isCancelled) {
+          console.log(result);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error('Error fetching data:', error);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+  ```
+
+  - 클린업 함수 사용: `useEffect`에서 반환하는 함수는 컴포넌트가 언마운트되거나, 의존성이 변경될 때 호출된다. 이 클린업 함수에서 `isCancelled` 변수를 사용해 비동기 작업이 완료되지 않았을 때의 상태를 처리할 수 있다.
+
+**4. 비동기 작업을 커스텀 훅으로 분리**
+
+- 복잡한 비동기 작업이 여러 곳에서 반복해서 사용된다면, 이를 커스텀 훅으로 분리하는 것도 좋은 방법이다. 이렇게 하면 코드의 재사용성과 가독성을 높일 수 있다.
+
+  ```tsx
+  const useFetchData = () => {
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const result = await someFetch();
+          setData(result);
+        } catch (error) {
+          setError(error);
+        }
+      };
+
+      fetchData();
+    }, []);
+
+    return { data, error };
+  };
+  ```
+
+  - 커스텀 훅 사용: 비동기 작업 로직을 커스텀 훅으로 분리하면, 해당 로직을 여러 컴포넌트에서 쉽게 재사용할 수 있으며, 코드의 가독성도 향상된다.
 
 ### ⭐️ 요약
 
-- `useEffect` 내부에서 비동기 함수를 사용하는 것이 아닌, 커스텀 훅이나, 다른 곳에서 사용할 수 있도록 하자
+- `useEffect` 내부에서 바로 비동기 함수를 사용하는 대신, `async` 함수는 따로 선언한 후 호출하는 방식으로 처리한다.
+- 비동기 작업 중 컴포넌트가 언마운트되거나 의존성 배열의 값이 변경되면 중단될 수 있도록 클린업 함수를 사용해 취소 처리할 수 있다.
+- 복잡한 비동기 작업은 커스텀 훅으로 분리해 재사용성과 가독성을 높이자.
 
 <br />
 
