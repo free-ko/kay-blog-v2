@@ -1,0 +1,245 @@
+---
+title: 'Clean React 06 - Etc'
+date: '2024-09-21 12:30:00'
+description: React 기타 참고 내용에 대해 알아보자.
+published: true
+---
+
+# 1. Import React
+
+---
+
+### 🌈 결론
+
+- React v17 이상부터는 `import React from 'react';` 구문을 작성하지 않아도 됩니다.
+
+### ✍️ 내용
+
+1. React 17 버전 이상에서는 JSX가 내부적으로 컴파일되므로, 컴포넌트 파일마다 `import React` 구문을 명시하지 않아도 정상 작동합니다.
+2. React는 자동으로 JSX를 컴파일하게 되어, 불필요한 코드 작성을 줄여줍니다.
+
+### ⭐️ 요약
+
+- React 17 이상 버전에서는 `import React`를 생략할 수 있습니다. 프로젝트에서 사용하는 React 버전을 확인하고, 필요시 최신 버전으로 업데이트하는 것도 좋은 방법입니다.
+
+<br />
+<br />
+
+# 2. 디렉터리 구조
+
+---
+
+### 🌈 결론
+
+- 다양한 개발자와 협업하기 위해서는 `일관성 있는 디렉터리 구조`를 설계하는 것이 중요합니다.
+- 결합도가 높은 컴포넌트들은 `같은 폴더 내에 배치`하는 것이 좋습니다.
+
+### ✍️ 내용
+
+1. **정답은 없지만, 일관성 유지가 핵심**
+
+   - 디렉터리 구조에 정해진 정답은 없으나, 의존성이나 결합도를 고려한 구조를 유지하는 것이 좋습니다.
+
+2. **기본 컴포넌트 구성 예시**
+
+- ❌ 안 좋은 예시
+  ```tsx
+  components/
+  |- MyButton.tsx
+  |- ViewTable.tsx
+  |- Icon.tsx
+  ```
+- ✅ 좋은 예시
+
+  ```tsx
+  components/
+  |- BaseButton.tsx
+  |- BaseTable.tsx
+  |- BaseIcon.tsx
+  ```
+
+3. **결합도가 높은 컴포넌트를 묶어주는 것이 좋습니다.**
+
+- ❌ 안 좋은 예시
+
+  ```tsx
+  components/
+  |- TodoList.tsx
+  |- TodoItem.tsx
+  |- TodoButton.tsx
+  ```
+
+- ✅ 좋은 예시
+
+  ```tsx
+  components/
+  |- TodoList.tsx
+  |- TodoListItem.tsx
+  |- TodoListItemButton.tsx
+  ```
+
+4. **관심사를 분리하여 디렉터리 구조를 구성합니다.**
+
+- ❌ 안 좋은 예시
+
+  ```tsx
+  components/
+  |- ClearSearchButton.tsx
+  |- ExcludeFromSearchInput.tsx
+  |- RunSearchButton.tsx
+  |- SearchInput.tsx
+  |- TermsCheckbox.tsx
+  ```
+
+- ✅ 좋은 예시
+
+  ```tsx
+  components/
+  |- SearchButtonClear.tsx
+  |- SearchButtonRun.tsx
+  |- SearchInputQuery.tsx
+  |- SearchInputExcludeGlob.tsx
+  |- SettingsCheckboxTerms.tsx
+  |- SettingsCheckboxLaunchOnStartup.tsx
+  ```
+
+5. **폴더 구조 제안**
+
+   ```tsx
+   // 제안 1
+   components/
+   |- @shared
+   |-- 공통 컴포넌트
+   |- Todo
+   |-- Todo.tsx
+   |-- Todo.hook.ts
+   |-- todo.css
+
+   // 제안 2
+   hooks/
+   |- useTodo.ts
+
+   styles/
+   |- todo.css
+
+   components/
+   |- Todo.tsx
+   ```
+
+### ⭐️ 요약
+
+- 컴포넌트들의 결합도와 관심사에 따라 디렉터리 구조를 세우면 협업이 수월해지고 유지보수하기 쉬워집니다. 같은 팀원들과 일관된 방식을 유지하는 것이 가장 중요합니다.
+
+<br />
+<br />
+
+# ✅ SPA에서의 새로고침
+
+---
+
+### 🌈 결론
+
+1. SPA에서 `window.location.reload()` 사용을 주의하자
+
+### ✍️ 내용
+
+1. `window.location.reload()`
+
+   ```tsx
+   export default function Login(props) {
+     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+     const handleLogin = async () => {
+       try {
+         if (isSuccess) {
+           setIsLoggedIn(true);
+
+           // 로그인 성공 후, 아래와 같은 로직을 작동시키는 것이 주니어 개발자가 많이 하는 실수
+           // - SPA에서는 해당 함수 실행시 재 작동 요청
+           // - SPA 입장에서는 앱을 완전히 종료하고 다시 실행하는 행위
+           // - SPA는 마크업, 인터렉션 등을 JS에서 하고 있음
+           // - 그래서 아래와 같이 함수를 작동하면 JS를 다시 다운로드 함
+           window.location.reload();
+         }
+       } catch (e) {
+         alert('로그인에 실패했습니다.');
+         throw new Error(e);
+       }
+     };
+   }
+   ```
+
+### ⭐️ 요약
+
+1. SPA에서 `window.location.reload()` 사용하기 전에 다른 방법이 없는지 확인하자.
+
+# ✅ Primitive UI
+
+---
+
+### 🌈 결론
+
+### ✍️ 내용
+
+1. HTML 표준 태그
+
+   - `View` 같은 경우는 시멘틱한 태그를 사용할 수 있도록 아에 컨벤션이 있음
+     - app-header, app-footer
+   - `React` 자유도가 너무 높아서 표준 태그를 사용안하는 경우가 많이 있음
+
+   ```tsx
+   // ❌
+   <TodoList />
+   <TodoList />
+
+   // ✅
+   // - 시멘틱한 Base 컴포넌트를 만들어서 확장할 수 있도록 디자인 시스템과 비슷한 구조로 가져감
+   <List />
+   <Item />
+
+   // 🤔
+   // - 아래와 같은 경우
+   // - 도메인 네임보다는 Semantic한 Primitive한 UI를 묘사한다.
+   // ex) Radix UI, ChakraUI
+
+   // - 또한 '생김새'를 묘사한다.
+   <Box />
+   <Circle />
+   <List />
+   <Square />
+   ```
+
+   - [Radix UI](https://www.radix-ui.com/primitives/docs/components/alert-dialog)
+   - [Chakra UI](https://v2.chakra-ui.com/)
+
+2. 예시
+
+   - 시멘틱 하게 구현할 때, 시멘틱한 타입을 적용해서 구현하자.
+
+   ```tsx
+   interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+   	...
+   }
+
+   const Button = (props: IButtonProps) => {
+   	return (
+   		<button {...props}>
+   			{children}
+   		</button>
+   	)
+   }
+   ```
+
+### ⭐️ 요약
+
+- 컴포넌트를 만들 때 시멘틱하게 만들자.
+
+<br />
+
+### 참고
+
+- [클린코드 리액트](https://www.udemy.com/course/clean-code-react/)
+
+```
+
+```
