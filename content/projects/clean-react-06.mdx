@@ -1,7 +1,7 @@
 ---
 title: 'Clean React 06 - Etc'
 date: '2024-09-21 12:30:00'
-description: React 기타 참고 내용에 대해 알아보자.
+description: 기타 참고 내용에 대해 알아보자.
 published: true
 ---
 
@@ -206,73 +206,69 @@ published: true
 <br />
 <br />
 
-# ✅ Primitive UI
+# 4. Primitive UI
 
 ---
 
 ### 🌈 결론
 
+- **Primitive UI**는 시멘틱한 HTML 표준 태그와 컴포넌트를 사용해 UI를 구성하는 방식을 의미하며, 이는 사용자 경험을 향상시키고 유지보수를 용이하게 합니다. React와 같은 자유도가 높은 라이브러리에서도 시멘틱한 구조를 유지할 수 있도록 Base 컴포넌트를 활용해 디자인 시스템과 유사한 패턴을 채택할 수 있습니다.
+
 ### ✍️ 내용
 
-1. HTML 표준 태그
+**1.HTML 표준 태그의 중요성**
 
-   - `View` 같은 경우는 시멘틱한 태그를 사용할 수 있도록 아에 컨벤션이 있음
-     - app-header, app-footer
-   - `React` 자유도가 너무 높아서 표준 태그를 사용안하는 경우가 많이 있음
+- 웹 접근성(Accessibility)과 검색 엔진 최적화(SEO)를 고려할 때, 표준 HTML 태그를 사용하는 것이 매우 중요합니다.
+- 표준 태그는 사용자 에이전트(브라우저, 스크린 리더 등)가 웹 페이지의 구조를 더 쉽게 이해할 수 있도록 도와줍니다.
 
-   ```tsx
-   // ❌
-   <TodoList />
-   <TodoList />
+**2.시멘틱한 태그 사용 예시**
 
-   // ✅
-   // - 시멘틱한 Base 컴포넌트를 만들어서 확장할 수 있도록 디자인 시스템과 비슷한 구조로 가져감
-   <List />
-   <Item />
+- 비시멘틱한 태그 대신 `header, footer, section`과 같은 HTML 표준 시멘틱 태그를 사용하는 것이 좋습니다.
 
-   // 🤔
-   // - 아래와 같은 경우
-   // - 도메인 네임보다는 Semantic한 Primitive한 UI를 묘사한다.
-   // ex) Radix UI, ChakraUI
+**3.React에서의 자유도와 시멘틱 태그**
 
-   // - 또한 '생김새'를 묘사한다.
-   <Box />
-   <Circle />
-   <List />
-   <Square />
-   ```
+- React는 컴포넌트 단위로 동작하는 만큼 자유도가 매우 높아, 시멘틱한 HTML 태그 대신 컴포넌트 자체만으로 구성되는 경우가 많습니다.
+- 이런 경우, 디자인 시스템과 비슷한 패턴을 적용해 Base 컴포넌트를 시멘틱하게 구성할 수 있습니다.
 
-   - [Radix UI](https://www.radix-ui.com/primitives/docs/components/alert-dialog)
-   - [Chakra UI](https://v2.chakra-ui.com/)
+**4.Base 컴포넌트를 사용한 시멘틱 확장**
 
-2. 예시
+```tsx
+// ❌ 비시멘틱한 코드
+<TodoList />
+<TodoItem />
 
-   - 시멘틱 하게 구현할 때, 시멘틱한 타입을 적용해서 구현하자.
+// ✅ 시멘틱한 Base 컴포넌트로 리팩토링한 코드
+<List />
+<Item />
+```
 
-   ```tsx
-   interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-   	...
-   }
+- 위 예시에서는 `TodoList`와 `TodoItem` 같은 도메인 네임보다는, 시멘틱하고 확장 가능한 `List`, `Item` 등의 Primitive 컴포넌트를 사용하는 것이 더 적합합니다.
 
-   const Button = (props: IButtonProps) => {
-   	return (
-   		<button {...props}>
-   			{children}
-   		</button>
-   	)
-   }
-   ```
+**5.Primitive UI의 의미와 특징**
+
+- Primitive UI는 시멘틱한 기본 컴포넌트를 이용해 구성 요소를 묘사하는 방식입니다.
+- 예를 들어, [Radix UI](https://www.radix-ui.com/primitives/docs/components/alert-dialog), [Chakra UI](https://v2.chakra-ui.com/) 같은 라이브러리에서는 UI 컴포넌트를 생김새와 시멘틱 구조로 나눠서 묘사합니다.
+  - `Box`, `Circle`, `List`, `Square` 등 형태나 레이아웃을 묘사하는 컴포넌트들이 대표적인 예입니다.
+
+**6.도메인 네임 대신 시멘틱 컴포넌트 사용**
+
+- 컴포넌트 이름을 특정 도메인(업무 목적)에 맞추기보다는 UI의 생김새와 역할을 시멘틱하게 묘사하는 것이 유지보수와 재사용성에 유리합니다.
+
+  ```tsx
+  // ✅ 생김새와 역할을 묘사한 예시
+  <Box />
+  <Circle />
+  <List />
+  <Square />
+  ```
 
 ### ⭐️ 요약
 
-- 컴포넌트를 만들 때 시멘틱하게 만들자.
+- 디자인 시스템과 컴포넌트 라이브러리를 활용해 시멘틱한 Base 컴포넌트를 정의하고, 이를 확장하는 방식은 UI의 일관성을 유지하는 데 매우 유리합니다.
+- 웹 접근성을 고려해, 사용자에게 더 직관적인 태그 구조를 제공하는 것이 좋습니다.
 
 <br />
 
 ### 참고
 
 - [클린코드 리액트](https://www.udemy.com/course/clean-code-react/)
-
-```
-
-```
