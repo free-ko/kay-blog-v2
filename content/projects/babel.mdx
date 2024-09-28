@@ -1,7 +1,7 @@
 ---
 title: 'Babel에 대해'
 description: Babel에 대해 자세히 알아보자.
-date: '2024-08-10 09:05:00'
+date: '2024-09-28 09:05:00'
 published: true
 ---
 
@@ -14,32 +14,50 @@ published: true
 
 <br />
 
-## Babel 트랜스파일링 과정
+# Babel 트랜스파일링 과정
 
-babel 컴파일 과정
+Babel의 트랜스파일링 과정은 크게 세 단계로 나눌 수 있습니다. 이 과정을 통해 최신 JavaScript 코드가 하위 호환성을 유지하면서도 실행 가능하게 변환됩니다.
 
-- 파싱(parsing) 단계: babel이 소스코드를 파싱하여 AST를 생성(이때 생성되는 트리는 JSON 형태와 비슷). AST에서 각각의 노드들은 관계를 형성
-- 변환(transform) 단계: AST를 브라우저가 지원하는 코드로 변환. 이때 개발자가 설정한 plugin과 preset들에 의해서 컴파일됨
-- 생성(generate) 단계: AST를 코드로 출력
+**1. 파싱(Parsing)**
 
-### AST란
+- Babel이 소스 코드를 파싱하여 AST(Abstract Syntax Tree)를 생성합니다.
+- 이때 생성되는 트리는 JSON 형태와 비슷하며, 코드의 구조를 계층적으로 표현합니다.
+- AST에서 각각의 노드는 코드의 구성 요소를 나타내며 서로 관계를 형성합니다.
 
-AST(Abstract Syntax Tree)란 프로그래밍 언어의 문법에 따라 소스코드 구조를 표시하는 계층적 프로그램 표현. HTML을 파싱할 때도 사용됨. babel 플러그인은 babel 컴파일 단계에서 AST(Abstract Syntax Tree)를 변형하는 역할을 수행함. Babel은 플러그인이 변형시킨 AST를 가지고 타깃 코드를 생성함
+**2. 변환(Transform)**
+
+- 파싱된 AST는 브라우저가 지원하는 코드로 변환됩니다.
+- 이때 개발자가 설정한 플러그인(plugin)과 프리셋(preset)을 기반으로 변환 작업이 이루어집니다.
+
+**3. 생성(Generate)**
+
+- 변환된 AST는 다시 코드로 출력됩니다. 이 과정에서 변환된 코드는 호환성이 유지된 상태로 배포할 수 있습니다.
 
 <br />
 
-## Babel config
+### AST란
 
-- babel 설정 파일을 만들어주는 방법에는 babel.config.json과 .babelrc.json이 있음. 각각은 사용하는 경우가 조금 다름
+AST(Abstract Syntax Tree)는 소스 코드의 구조를 트리 형태로 나타내는 표현입니다. 프로그래밍 언어의 문법에 따라 소스 코드를 파싱하여 생성됩니다.
 
-### babel.config.json
+- Babel은 AST를 기반으로 코드를 변환합니다.
+- 각 노드들은 프로그래밍 언어의 요소들(변수, 함수, 연산자 등)을 나타내며, 이 트리 구조를 통해 코드의 흐름과 문법을 이해하고 변형할 수 있습니다.
+- HTML과 같은 마크업 언어를 파싱할 때도 AST를 사용합니다.
 
-- babel 설정 파일을 root 폴더에 생성함.
-- 프로젝트 전체의 설정을 위해서 사용하며, 하나의 레포(monorepo)를 사용하고 있는 경우 권장됨.
-- babel 6 까지는 .babelrc로 설정을 관리했지만, babel 7부터는 babel.config.json 파일을 사용하는 것을 권장함
-- [babel 공식 문서](https://babeljs.io/docs/usage#configuration)에서 제공하는 babel.config.json 파일의 내용은 다음과 같음
+Babel의 플러그인은 이 AST를 변형하여 원하는 코드로 변환하는 역할을 합니다. 변형된 AST는 다시 코드로 생성됩니다.
 
-  ```json
+<br />
+
+### Babel 설정 파일 (Babel Config)
+
+Babel은 프로젝트의 요구에 맞게 다양한 설정 파일을 통해 동작을 제어할 수 있습니다.
+
+1. `babel.config.json`
+
+- 루트 폴더에 생성되며, 프로젝트 전체에 적용됩니다.
+- `Monorepo`와 같은 구조에서 유용하며, 전체 프로젝트에서 통일된 설정을 적용할 수 있습니다.
+- Babel 7부터 `.babelrc` 대신 `babel.config.json`을 권장합니다.
+
+  ```jsx
   {
     "presets": [
       [
@@ -57,18 +75,22 @@ AST(Abstract Syntax Tree)란 프로그래밍 언어의 문법에 따라 소스�
   }
   ```
 
-### babel.config.json
+2. `.babelrc.json`
 
-- babel 설정을 해당 파일이 속한 package에만 적용함.
-- 프로젝트의 일부에만 적용되는 설정 작성 시 사용하며, 특정 파일들에 대해서 컴파일을 할 때 유용함
+- 특정 패키지나 파일에만 적용되는 로컬 설정 파일입니다.
+- 프로젝트 일부에만 적용할 설정을 정의할 때 유용합니다.
 
-### babel-loader
+<br />
 
-- webpack을 사용하고 있다면 babel을 webpack에서 실행시켜주는 도구인 babel-loader를 사용할 수 있음.
-- babel-loader 설치 후 webpack config의 loader 목록에에 babel-loader를 넣고 필요한 옵션을 추가하면 됨.
-- package.json에 명시한 scripts를 통해 webpack을 실행하면 번들링 과정에서 babel이 코드의 트랜스파일링을 진행함.
-- node_modules는 트랜스파일링이 필요 없으므로 exclude 옵션으로 제외시켜 줌.
+### Babel과 Webpack
 
+Babel을 Webpack과 함께 사용하려면 `babel-loader`를 설치하여 사용합니다.
+
+**1.Babel Loader 설정**
+
+- `babel-loader`는 Babel을 Webpack의 로더로 실행시키는 역할을 합니다.
+- Webpack 설정 파일에서 Babel을 설정한 후, 프로젝트 번들링 시 Babel이 코드 트랜스파일링을 진행합니다.
+- `node_modules`는 트랜스파일링이 필요 없으므로, exclude 옵션으로 제외해야 성능을 최적화할 수 있습니다.
   ```js
   // webpack.config.js
   module.exports = {
@@ -76,7 +98,7 @@ AST(Abstract Syntax Tree)란 프로그래밍 언어의 문법에 따라 소스�
       rules: [
         {
           test: /\.(tsx|ts)$/,
-          exclude: 'node_modules',
+          exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
             options: {
@@ -97,234 +119,166 @@ AST(Abstract Syntax Tree)란 프로그래밍 언어의 문법에 따라 소스�
   };
   ```
 
-  - [참고](https://webpack.js.org/loaders/babel-loader/)
+<br />
+
+### Babel의 플러그인(Plugins)과 프리셋(Presets)
+
+**1. 플러그인(Plugins)**
+
+- Babel에서 코드 변환은 플러그인을 통해 이루어집니다.
+- 각 플러그인은 Babel 컴파일 과정에서 AST를 변형하는 역할을 하며, 변형된 AST를 가지고 타겟 코드를 생성합니다.
+
+**2. 프리셋(Presets)**
+
+- 프리셋은 플러그인들의 집합입니다.
+- 여러 플러그인을 하나씩 추가하는 대신, 그룹으로 묶어 한 번에 설정할 수 있습니다.
+- 대표적인 Preset들:
+  - `@babel/preset-env`: 최신 자바스크립트 문법을 ES5로 변환
+  - `@babel/preset-react`: React의 JSX를 변환
+  - `@babel/preset-typescript`: TypeScript 문법 지원
+
+각 프리셋은 해당 문법을 변환하는 데 필요한 플러그인들을 포함하고 있습니다.
 
 <br />
 
-## plugin과 presets
+### Babel과 React
 
-### plugin
+Babel을 사용하면 React의 JSX 문법도 트랜스파일링할 수 있습니다.
 
-- babel에서 코드의 변환은 plugin의 구성에 따라 결정됨.
-- babel plugin은 babel 컴파일 단계에서 AST를 변형하는 역할을 함.
-- babel은 plugin이 변형시킨 AST를 가지고 타겟 코드를 생성함
-- [참고](https://tech.kakao.com/2020/12/01/frontend-growth-02/)
+- `@babel/preset-react`은 JSX 코드를 React의 `React.createElement` 함수 호출로 변환합니다.
 
-### presets
-
-- preset은 plugin들의 집합임.
-- plugin을 하나하나 추가해주는 대신, 적용할 규칙들을 그룹으로 묶은 preset으로 한번에 지정해줄 수 있음.
-- 예를 들면 ES6 문법들을 모아둔 es2015 preset과 react에서 사용하는 문법들을 모아둔 react preset이 있음.
-- preset들을 우선적으로 추가하고, 추가적으로 사용하고 싶은 plugin들을 기재해줌
-- babel이 제공하는 공식 babel preset들은 아래와 같음
-  - @babel/preset-env
-  - @babel/preset-flow
-  - @babel/preset-react
-  - @babel/preset-typescript
-- 이 중 @babel/preset-env은 타겟 환경에 필요한 구문 변환(syntax transform), 브라우저 폴리필(browser polyfill)을 제공하며, 나머지 항목들은 각각 flow, react, typescript 사용 시 babel에서 지원해주는 preset임
-- [참고](https://babeljs.io/docs/en/babel-preset-env)
-
-<br />
-
-## Babel과 React
-
-- React에서 babel을 사용하면 JSX 문법을 트랜스파일링해줄 수 있음. 이때 @babel/preset-react이 필요.
-- @babel/preset-react은 JSX 코드를 React.createElement 호출 코드로 바꿔줌
-
-```jsx
-// babel 컴파일 전
-const profile = (
-  <div>
-    <img src='profile.png' className='profile' />
-    <h1>{[user.firstName, user.lastName].join(' ')}</h1>
-  </div>
-);
-```
-
-```js
-// babel 컴파일 후
-const profile = React.createElement(
-  'div',
-  null,
-  React.createElement('img', { src: 'profile.png', className: 'profile' }),
-  React.createElement('h1', null, [user.firstName, user.lastName].join(' '))
-);
-```
-
-- [참고](https://babeljs.io/docs/babel-preset-react)
-
-<br />
-
-## Babel과 TypeScript
-
-- @babel/preset-typescript preset을 설치하여 babel을 TypeScript와 함께 사용할 수 있음.
-- 하지만 babel은 타입 체크까지 해주지는 않음. 타입 체킹은 TypeScript에게 맡기기 위해 webpack 설정에서 ts-loader를 사용할 수 있음
-- 다만 ts-loader는 속도가 느리기 때문에, babel-loader를 사용하는 것을 권장하고 있음. (ts-loader는 HMR도 지원하지 않음) babel-loader 단독으로는 타입 체킹을 해주지 않기 때문에, fork-ts-checker-webpack-plugin과 같은 별도의 타입 체크 plugin을 설치해줌
-- [참고](https://babeljs.io/docs/#type-annotations-flow-and-typescript)
-
-<br />
-
-## polyfill
-
-- Babel을 사용한다고 해서 모든 JavaScript 최신 함수를 사용할 수 있는 것은 아님.
-- babel 문법을 변환해주는 역할만 함. polyfill은 구형 브라우저에서 지원하지 않는 객체를 지원하도록 특별한 코드를 추가함. babel은 컴파일 타임에 실행되고, babel-polyfill은 런타임에 실행됨.
-
-- @babel/polyfill은 core-js와 regenerator-runtime을 포함하여 ES6 이상의 환경을 완전히 지원할 수 있음.
-- babel/polyfill은 Promise, WeakMap과 같은 객체들을 전역 스코프에 추가해줌. 그러나 필요하지 않은 코드까지 불러와 번들 크기가 커진다는 단점이 있음
-- 또한 전역에 import로 모듈들을 불러오기 때문에, 전역 스코프를 오염시키는 문제가 있음. 이제 바벨은 위 방식 대신 @babel/plugin-transform-runtime과 core-js@3 plugin을 사용하여 설정 파일을 작성할 것을 권장함. (webpack을 사용한다면 webpack 설정 파일에 추가해줌)
-
-```js
-// webpack.config.js
-{
-  "plugins": [
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        "absoluteRuntime": false,
-        "corejs": 3, // corejs 설정
-        "helpers": true,
-        "regenerator": true,
-        "useESModules": false
-      }
-    ]
-  ]
-}
-```
-
-- @babel/plugin-transform-runtime babel은 모든 helper 함수들을 매번 중복으로 생성하는 것을 방지하기 위해, babel 런타임을 별도의 모듈로 분리하고자 사용함.
-- 설정 시 헬퍼 함수들을 한 곳(@babel/runtime)에서 참조하여 코드의 크기를 줄일 수 있음. 또 내부적으로 regenerator-runtime과 core-js를 peerDependencies로 갖고 있어 따로 설정을 해주지 않고 필요한 polyfill을 사용할 수 있음
-
-### Babel 트랜스파일링 시 polyfill 동작 원리
-
-1. .babelrc, .babelrc.json, package.json, 또는 babel.config.js에 명시된 browserslist의 타겟 브라우저를 탐색함
-2. 타겟 브라우저를 core-js와 매핑함
-3. 특정 문법을 지원하지 않는 구형 브라우저의 경우 polyfill을 주입함
-
-### 정리
-
-- babel은 자바스크립트의 최신 문법을 자바스크립트 ES5 표준으로 바꿔주는 역할을 함.
-- polyfill은 자바스크립트 문법으로 인식은 하고 있지만 Promise, Set, Map처럼 구형 브라우저에서 지원하지 않는 객체들을 정의해주는 역할을 함.
-
-[참고](https://ljs0705.medium.com/babel-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0-a1d0e6bd021a)
-
-<br />
-
-## Babel에서 Promise를 처리하는 방식
-
-- ES6에서 등장한 Promise는 구형 브라우저들에서는 이해하지 못하는 문법임. 따라서 polyfill이 필요함
-
-Promise는 babel에서 아래와 같이 컴파일됨
-
-```ts
-// <ES6에서 Promise>
-let promise = new Promise((resolve, reject) => {
-  return resolve(1);
-});
-
-promise.then((value) => console.log(value)).catch((e) => console.error(e));
-```
-
-```ts
-// <babel로 변환된 Promise>
-// - Promise 자체는 코드의 변화는 크지 않음.
-var promise = new Promise(function (resolve, reject) {
-  return resolve(1);
-});
-promise
-  .then(function (value) {
-    return console.log(value);
-  })
-  ['catch'](function (e) {
-    return console.error(e);
-  });
-```
-
-```ts
-// <ES6의 async-await>
-async function testFunc() {
-  let value = await promise;
-  console.log(`async ${value}`);
-}
-
-testFunc();
-```
-
-```ts
-// <babel로 변환된 async-await>
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-  try {
-    var info = gen[key](arg);
-    var value = info.value;
-  } catch (error) {
-    reject(error);
-    return;
-  }
-  if (info.done) {
-    resolve(value);
-  } else {
-    Promise.resolve(value).then(_next, _throw);
-  }
-}
-
-function _asyncToGenerator(fn) {
-  return function () {
-    var self = this,
-      args = arguments;
-    return new Promise(function (resolve, reject) {
-      var gen = fn.apply(self, args);
-      function _next(value) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'next', value);
-      }
-      function _throw(err) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'throw', err);
-      }
-      _next(undefined);
-    });
-  };
-}
-function testFunc() {
-  return _testFunc.apply(this, arguments);
-}
-
-function _testFunc() {
-  _testFunc = _asyncToGenerator(
-    /*#__PURE__*/ regeneratorRuntime.mark(function _callee() {
-      var value;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch ((_context.prev = _context.next)) {
-            case 0:
-              _context.next = 2;
-              return promise;
-
-            case 2:
-              value = _context.sent;
-              console.log('async '.concat(value));
-
-            case 4:
-            case 'end':
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    })
+  ```jsx
+  // babel 컴파일 전
+  const profile = (
+    <div>
+      <img src='profile.png' className='profile' />
+      <h1>{[user.firstName, user.lastName].join(' ')}</h1>
+    </div>
   );
-  return _testFunc.apply(this, arguments);
-}
+  ```
 
-testFunc();
-```
-
-- async 키워드는 generator에, await 키워드는 yield에 대응됨.
-- 하나의 로직이 종료될 때마다 이터레이터 객체의 메서드인 next를 호출하여 다음 로직을 수행함.
-- 이때 반환값이 완료(done) 상태라면 값을 성공적으로 반환(resolve)하고, 그렇지 않다면 다시 Promise를 재귀적으로 호출함
-- 이때 generator도 ES5에 정의되지 않았기 때문에 babel은 regenerator 라이브러리를 사용하여 generator를 흉내낸 함수를 구현함. 여기서는 `_asyncToGenerator`가 그 역할을 하고 있음
-- generator는 비동기적 패턴을 yield를 통해 동기적인 “모습”으로 바꾸어주고, promise는 generator로 만든 iterator를 반복해서 실행해주는 역할을 함. await keyword에 사용하는 함수가 항상 Promise를 반환해야하는 이유임
-
-[참고](https://betterprogramming.pub/how-polyfill-works-in-babel-b8cfbbc8351f?gi=11ec810deeea)
+  ```js
+  // babel 컴파일 후
+  const profile = React.createElement(
+    'div',
+    null,
+    React.createElement('img', { src: 'profile.png', className: 'profile' }),
+    React.createElement('h1', null, [user.firstName, user.lastName].join(' '))
+  );
+  ```
 
 <br />
 
-## 참고
+### Babel과 TypeScript
+
+Babel은 TypeScript를 트랜스파일링할 수도 있습니다.
+
+- `@babel/preset-typescript`를 사용하여 TypeScript 코드를 변환할 수 있지만, 타입 체킹은 Babel에서 지원하지 않습니다.
+- 타입 체킹은 `ts-loader`와 같은 별도의 도구를 사용하여 처리해야 하며, Babel과 함께 사용하는 경우 `fork-ts-checker-webpack-plugin`과 같은 플러그인이 필요합니다.
+
+<br />
+
+### Polyfill과 Babel
+
+Babel은 최신 자바스크립트 문법을 변환하지만, 모든 최신 기능을 지원하는 것은 아닙니다. 특히, `Promise`나 `WeakMap` 같은 최신 객체는 변환되지 않으므로 `Polyfill`이 필요합니다.
+
+**1. Polyfill이 필요한 이유**
+
+    - 구형 브라우저에서는 최신 문법과 객체를 지원하지 않기 때문에, 런타임에 특정 기능을 추가해야 합니다.
+
+**2. `@babel/polyfill`**
+
+    - 과거에는 `@babel/polyfill`이 사용되었으나, 최근에는 `@babel/plugin-transform-runtime`과 `core-js@3`를 사용하는 방식이 권장됩니다.
+
+      ```js
+      // webpack.config.js 설정
+      module.exports = {
+        plugins: [
+          [
+            '@babel/plugin-transform-runtime',
+            {
+              corejs: 3, // core-js 설정
+              regenerator: true,
+            },
+          ],
+        ],
+      };
+      ```
+
+<br />
+
+### Babel에서 Promise 처리
+
+Babel은 ES6에서 등장한 Promise를 구형 브라우저에서도 사용할 수 있도록 변환합니다.
+
+- `async/await` 문법은 `generator`와 대응되며, `regenerator-runtime`을 통해 변환됩니다.
+
+  ```js
+  // ES6의 async-await
+  async function testFunc() {
+    let value = await promise;
+    console.log(value);
+  }
+
+  // Babel로 변환된 코드
+  function _asyncToGenerator(fn) {
+    return function () {
+      var self = this,
+        args = arguments;
+      return new Promise(function (resolve, reject) {
+        var gen = fn.apply(self, args);
+        function _next(value) {
+          asyncGeneratorStep(
+            gen,
+            resolve,
+            reject,
+            _next,
+            _throw,
+            'next',
+            value
+          );
+        }
+        function _throw(err) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'throw', err);
+        }
+        _next(undefined);
+      });
+    };
+  }
+  ```
+
+  1. `async/await`와 `generator` 변환
+
+  - `async` 키워드는 `generator` 함수로 변환되며, `await` 키워드는 `yield`에 대응됩니다.
+  - `Babel`은 이러한 변환을 통해 비동기 코드를 동기적 흐름처럼 사용할 수 있게 합니다.
+
+  2. 이터레이터 메서드 호출
+
+  - 하나의 로직이 종료될 때마다 이터레이터 객체의 메서드인 `next()`가 호출되어 다음 로직을 실행합니다.
+  - `next()` 메서드는 비동기적 패턴을 관리하는데, 이터레이터의 반환값이 완료 상태(done)라면 `resolve`로 값을 반환합니다.
+
+  3. 재귀적 `Promise` 호출
+
+  - 반환값이 완료되지 않은 경우, `Promise`를 다시 재귀적으로 호출하여 비동기 흐름을 처리합니다.
+  - 이때 비동기 처리의 흐름을 제어하는 부분은 `Babel`에서 변환된 `generator` 함수가 담당합니다.
+
+  4. `regenerator` 라이브러리 사용
+
+  - ES5에는 `generator`가 정의되지 않았기 때문에 `Babel`은 `regenerator` 라이브러리를 사용해 `generator`를 흉내낸 함수를 구현합니다.
+  - 여기서 `Babel`이 생성하는 함수가 `_asyncToGenerator`입니다.
+
+  5. `Promise`와 `generator`의 협력
+
+  - `generator`는 비동기적인 패턴을 `yield`를 통해 동기적인 흐름처럼 처리할 수 있도록 바꿔줍니다.
+  - `Promise`는 `generator`로 만들어진 이터레이터를 반복해서 실행하여 비동기 흐름을 관리합니다.
+  - `await` 키워드가 사용된 함수는 항상 `Promise`를 반환해야 하는 이유도, 이처럼 `generator`와 `Promise`가 협력해 비동기 로직을 처리하기 때문입니다.
+
+<br />
+
+### 참고
 
 - [Babel](https://babeljs.io/docs/usage)
+- [Babel Loader](https://webpack.js.org/loaders/babel-loader/)
+- [babel-preset-react](https://babeljs.io/docs/babel-preset-react)
+- [type-annotations-flow-and-typescript](https://babeljs.io/docs/#type-annotations-flow-and-typescript)
+- [Babel Promise 처리 방식 참고 글](https://betterprogramming.pub/how-polyfill-works-in-babel-b8cfbbc8351f?gi=11ec810deeea)
