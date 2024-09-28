@@ -5,7 +5,26 @@ date: '2024-08-09 07:07:00'
 published: true
 ---
 
-## File Input 다루는 법
+# File Input 다루는 법
+
+`<input type="file" />`은 React에서 다루기 까다로운 폼 요소 중 하나입니다. 파일 입력을 쉽게 처리하고, 상태 관리 및 유효성 검사를 효율적으로 구현하기 위해 아래 내용을 참고하세요.
+
+### 1. Form 관리의 어려움
+
+- React 앱에서 Form을 다루는 것은 복잡할 수 있습니다.
+  - Input 값의 상태를 일일이 관리해야 합니다.
+  - 각 Input마다 별도의 유효성 검사를 구현해야 합니다.
+- `React Hook Form`을 사용하면 Form 전체를 쉽게 관리할 수 있지만, `file` 타입의 Input은 별도로 다루어야 합니다.
+
+### 2. File Input의 특수성
+
+- 파일 선택 취소 기능이나 FileList 객체 관리 등의 이유로, 파일 입력은 애플리케이션 계층에서 관리되어야 합니다.
+- `react-hook-form`을 사용한 다른 Input들과 동일한 방식으로 파일 입력을 처리할 수 없습니다. (출처: React Hook Form 공식 문서)
+- 일반적인 `file input`은 `value`나 `onChange` 속성으로 제어되지 않음
+
+### 3. React의 File Input 제한 사항
+
+---
 
 `<input type="file" />`
 
@@ -15,8 +34,6 @@ published: true
 - 그러나 file 타입의 input 값을 가져오는 일은 쉽지 않음.
 
 <br />
-
-| 파일 타입의 인풋은 애플리케이션 계층에서 관리가 되어야 합니다. 파일 선택을 취소할 수도 있고 FileList 객체도 있기 때문입니다. (출처: react-hook-form 공식 문서)
 
 - 위와 같은 이유로 react-hook-form을 사용한 다른 input들과 같은 방식으로 file input을 작성할 수 없었음
 - 그리고 아래 이유로 value와 onChange 등을 이용하여 file input에 들어온 값을 바로 가져오기도 힘듦
