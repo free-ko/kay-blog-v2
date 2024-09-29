@@ -5,19 +5,104 @@ description: JS 번들러들에 대해 알아보자.
 published: true
 ---
 
-## Webpack
+# Webpack
 
-- 여러 개의 entry point로 의존성 그래프를 빌드하여, 각 모듈을 하나 이상의 모듈로 합침.
-- JS 이외 파일(CSS, 애셋 파일 등) 처리 시 loader 필요
-- parcel, rollup보다 code splitting 안전성 높음
-- webpack-dev-server 지원 (live-reload 지원)
-- 가장 역사가 깊으며, 레퍼런스가 많고 안정적이다
-- tree-shaking을 ES6 모듈에서만 지원하기 때문에 SideEffects 항목 별도 기재 필요
+`Webpack`은 가장 오래된 번들러 중 하나로, 여러 파일을 묶어주는 데 매우 강력한 도구입니다. 설정이 다소 복잡할 수 있지만, 확장성과 성능 면에서 매우 안정적입니다. `Webpack`은 복잡한 애플리케이션에서도 안전하게 `code splitting`을 해주며, 트리셰이킹 기능을 통해 불필요한 코드를 제거할 수 있습니다.설정이 다소 복잡할 수 있지만, 커뮤니티가 크고 레퍼런스가 많아 안정적인 선택이 될 수 있습니다.
 
-  - `{ sideEffects: false }` 를 표시하여 사용하지 않는 export는 제거해도 괜찮음을 webpack에게 알려줌
-  - 즉 side effect가 발생해도, 해당 구문을 사용하지 않는다면 제거함
+### 주요 특징
 
-- 많은 서드파티를 필요로 하는 복잡한 애플리케이션 임
+- **JS 이외의 파일 처리**: CSS, 이미지 파일과 같은 JS 이외의 파일들을 처리하려면 별도의 `loader`가 필요합니다. 예를 들어, `style-loader, css-loader` 등을 사용해 CSS 파일을 처리할 수 있습니다.
+- **안전한 Code Splitting**: `Parcel`이나 `Rollup`보다 코드 스플리팅의 안전성이 높아 복잡한 의존성 트리에서도 안정적으로 번들을 나눌 수 있습니다.
+- **Webpack Dev Server**: `webpack-dev-server`를 사용해 실시간으로 개발 환경에서 코드 변경을 반영하고, 자동으로 브라우저를 새로고침할 수 있습니다.
+- **역사가 깊고 안정적**: `Webpack`은 오랜 역사를 가진 번들러로, 많은 서드파티 플러그인과 레퍼런스를 통해 안정적인 사용이 가능합니다.
+- **Tree-shaking 지원**: Webpack은 트리셰이킹을 통해 사용하지 않는 코드를 제거할 수 있지만, ES6 모듈에서만 작동합니다. `package.json`의 `{ sideEffects: false }` 항목을 통해 `side effects`가 없는 코드를 명시적으로 알려줘야 불필요한 코드가 제거됩니다.
+- **복잡한 애플리케이션에 적합**: Webpack은 많은 서드파티 플러그인을 필요로 하며, 복잡한 애플리케이션에서 활용하기 적합합니다.
+
+### 예시 코드
+
+아래는 Webpack을 사용하여 JS, CSS, 이미지 파일을 번들링하는 예시입니다. 이 예시는 기본적인 설정을 포함하고 있습니다.
+
+```js
+// webpack.config.js
+const path = require('path');
+
+module.exports = {
+  mode: 'production', // 'development' 또는 'production' 모드를 선택
+  entry: './src/index.js', // 엔트리 파일 설정
+  output: {
+    filename: 'bundle.js', // 출력 파일 이름
+    path: path.resolve(__dirname, 'dist'), // 출력 파일 경로
+    clean: true, // 기존 번들 파일을 제거하고 새로 생성
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/, // CSS 파일을 처리하는 룰
+        use: ['style-loader', 'css-loader'], // style-loader와 css-loader 사용
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/, // 이미지 파일을 처리하는 룰
+        type: 'asset/resource', // 파일을 별도의 리소스로 처리
+      },
+    ],
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all', // 코드 스플리팅 설정
+    },
+    usedExports: true, // 사용되지 않는 export 제거 (트리셰이킹)
+  },
+};
+```
+
+### Tree-shaking 적용 방법
+
+`tree-shaking`을 적용하려면 ES6 모듈을 사용해야 하며, `package.json`에서 `side effects`를 명시해야 합니다. 이를 통해 `Webpack`은 불필요한 코드를 안전하게 제거할 수 있습니다.
+
+```json
+// package.json
+{
+  "name": "my-webpack-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "sideEffects": false, // 트리셰이킹 적용을 위한 설정
+  "dependencies": {
+    // 프로젝트 의존성 목록
+  }
+}
+```
+
+### Webpack Dev Server 설정
+
+개발 환경에서 실시간 반영을 위해 `webpack-dev-server`를 설정할 수 있습니다. 아래 예시는 `webpack-dev-server`를 통해 브라우저가 자동으로 새로고침되도록 설정한 코드입니다.
+
+```js
+// webpack.config.js
+const path = require('path');
+
+module.exports = {
+  mode: 'development', // 개발 모드 설정
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, 'dist'), // 개발 서버의 기본 경로
+    compress: true, // 파일 압축
+    port: 9000, // 서버 포트 번호
+    hot: true, // 핫 리로딩(HMR) 지원
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+};
+```
 
 <br />
 
