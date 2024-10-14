@@ -20,95 +20,93 @@ React에서는 Form 데이터를 관리하는 것이 다소 복잡할 수 있습
 
 - `React Hook Form`을 사용하면 폼 입력 값을 효율적으로 관리할 수 있지만, 파일 입력은 다른 입력 요소와는 다르게 특별히 다루어야 합니다.
 
----
+<br />
 
 ### 2. File Input의 특수성
 
-- 파일 선택 취소 기능이나 FileList 객체 관리 등의 이유로, 파일 입력은 애플리케이션 계층에서 관리되어야 합니다.
-- `react-hook-form`을 사용한 다른 Input들과 동일한 방식으로 파일 입력을 처리할 수 없습니다. (출처: React Hook Form 공식 문서)
-- 일반적인 `file input`은 `value`나 `onChange` 속성으로 제어되지 않음
+`<input type="file" />`은 다음과 같은 이유로 일반적인 폼 요소들과 다르게 처리해야 합니다
 
-### 3. React의 File Input 제한 사항
-
----
-
-`<input type="file" />`
-
-- 리액트 앱에서 다루기 어려운 것 중 하나가 바로 form.
-- form 안의 input 값의 상태를 일일히 관리해주어야 하고, 각각 validation까지 해준다면 더욱 복잡해짐
-- React Hook Form을 통해서 한번에 form 안의 모든 input 값들을 관리할 수 있음.
-- 그러나 file 타입의 input 값을 가져오는 일은 쉽지 않음.
+- 비제어 컴포넌트: React에서는 `<input type="file" />`의 값을 프로그래밍적으로 설정할 수 없으며, 오직 사용자가 직접 파일을 선택해야만 값이 설정됩니다. 이 때문에 파일 입력은 비제어 컴포넌트로 사용됩니다.
+- 파일 취소 및 FileList 관리: 파일 선택을 취소하거나, 여러 파일을 관리하는 FileList 객체를 처리하려면 애플리케이션 레벨에서 직접 제어해야 합니다.
 
 <br />
 
-- 위와 같은 이유로 react-hook-form을 사용한 다른 input들과 같은 방식으로 file input을 작성할 수 없었음
-- 그리고 아래 이유로 value와 onChange 등을 이용하여 file input에 들어온 값을 바로 가져오기도 힘듦
+### 3. File Input의 비제어 컴포넌트 처리
 
-<br />
+React에서 공식적으로 파일 입력을 다룰 때는 `ref`를 사용해 파일 선택을 처리합니다. 다음은 React의 공식 문서에서 제시하는 예시입니다.
 
-| React에서 `<input type="file" />`은 프로그래밍적으로 값을 설정 할 수 없고 사용자만이 값을 설정할 수 있기 때문에 항상 비제어 컴포넌트임 (출처 - react 공식 문서)
+```tsx
+import React, { useRef } from 'react';
 
-- 실제로 React 공식문서에서 file input은 아래와 같이 ref를 걸어 비제어 컴포넌트로 사용하고 있음
+const FileInput = () => {
+  const fileInputRef = useRef(null);
 
-```jsx
-class FileInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.fileInput = React.createRef();
-  }
-  handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    alert(`Selected file - ${this.fileInput.current.files[0].name}`);
-  }
+    if (fileInputRef.current?.files.length > 0) {
+      alert(`선택된 파일: ${fileInputRef.current.files[0].name}`);
+    } else {
+      alert('파일이 선택되지 않았습니다.');
+    }
+  };
 
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Upload file:
-          <input type='file' ref={this.fileInput} />
-        </label>
-        <br />
-        <button type='submit'>Submit</button>
-      </form>
-    );
-  }
-}
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        파일 업로드:
+        <input type='file' ref={fileInputRef} />
+      </label>
+      <br />
+      <button type='submit'>제출</button>
+    </form>
+  );
+};
+
+export default FileInput;
 ```
 
-- React Hook Form의 watch는 인자로 원하는 input 이름을 넣어주면, 해당 input의 값을 관찰하여 값이 바뀔 때 업데이트된 값을 즉시 알아챌 수 있음
+<br />
 
-```jsx
+### 4. React Hook Form을 사용한 파일 입력 처리
+
+React Hook Form을 사용하면 상태 관리가 훨씬 간편해집니다. 하지만 파일 입력은 별도로 다뤄야 하므로, watch와 같은 기능을 활용해 상태 변화를 추적할 수 있습니다.
+
+```tsx
 // Upload.tsx
 
 const Upload = () => {
   const { register, handleSubmit, setValue, watch } = useForm<FeedToUpload>();
-  const watchThumbnailImage = watch("thumbnailImage");
+  const watchThumbnailImage = watch('thumbnailImage');
 
   return (
-    // ...
-    <FileInput
-      fileName={watchThumbnailImage?.name}
-      onChange={(event) =>
-        setValue("thumbnailImage", event.currentTarget.files[0])
-      }
-    />
-    // ...
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <FileInput
+        fileName={watchThumbnailImage?.name}
+        onChange={(event) =>
+          setValue('thumbnailImage', event.currentTarget.files[0])
+        }
+      />
+      <button type='submit'>제출</button>
+    </form>
   );
 };
+
 // FileInput.tsx
-const FileInput = ({ fileName, ...options }: Props) => {
+
+const FileInput = ({ fileName, ...props }) => {
   return (
-    <Styled.Root>
-      <Styled.Label>
-        <input type="file" {...options} />
+    <div>
+      <label>
+        <input type='file' {...props} />
         <span>파일 선택</span>
-      </Styled.Label>
-      <Styled.FileNameText>
-        {fileName || "파일을 선택해주세요."}
-      </Styled.FileNameText>
-    </Styled.Root>
+      </label>
+      <p>{fileName || '파일을 선택해주세요.'}</p>
+    </div>
   );
 };
 ```
+
+**핵심 기능 설명**
+
+- `watch`: `watch("thumbnailImage")`는 thumbnailImage 필드의 상태를 관찰하여 파일이 선택될 때마다 값이 업데이트됩니다.
+- `setValue`: 파일 선택 시 setValue를 사용해 thumbnailImage 필드 값을 설정합니다.
