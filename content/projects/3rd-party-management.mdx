@@ -31,25 +31,20 @@ published: true
 
 이렇게 하면 외부 라이브러리에 대한 의존성을 줄일 수 있을 뿐만 아니라, 향후 라이브러리 변경이 발생하더라도 수정할 범위를 최소화할 수 있습니다.
 
-<br />
-
-### 추상화 벽 사용시, 장점
+**추상화 벽 사용시, 장점**
 
 `추상화 벽`을 사용하면 여러 가지 장점이 있습니다.
 
-1. 관리 포인트 감소: 외부 라이브러리와의 관리 포인트를 줄일 수 있습니다.
-2. 유지보수성 향상: 외부 라이브러리의 변경 사항이 있을 때, 해당 추상화 벽 코드만 수정하면 자동으로 사용하는 코드도 변경 사항에 반영됩니다. 모든 코드를 수정할 필요가 없어 유지보수성이 높아집니다.
-3. 복잡성 감소: 외부 라이브러리의 복잡한 내부 구조를 사용하는 코드에서 감출 수 있어 코드의 의존성을 최소화할 수 있습니다. 이로 인해 코드의 가독성이 높아지고, 변경도 유연하게 가능합니다.
+1. 관리 포인트 감소: 외부 라이브러리의 복잡한 내부 구조에 의존하지 않으므로 관리해야 할 포인트가 줄어듭니다.
+2. 유지보수성 향상: 라이브러리 업데이트 시, 추상화 벽만 수정하면 다른 모든 코드는 수정 없이 동작하게 됩니다. 이를 통해 유지보수가 훨씬 쉬워집니다.
+3. 복잡성 감소: 라이브러리의 복잡한 기능을 감추고, 필요한 기능만 추출함으로써 코드를 단순하게 유지할 수 있습니다.
 
-<br />
+**추상화 벽 사용 예시**
 
-### 추상화 벽 사용 예시
+아래 코드는 카카오톡 공유 기능을 추상화 벽으로 감싸 간단한 인터페이스만 노출한 예시입니다.
 
-아래 코드는 카카오톡 공유하기 기능을 사용하기 위해 작성된 코드입니다.
-이 코드에서는 추상화 벽을 세워 필요한 인터페이스만 노출시키고, 나머지 기능은 Wrapping 함수를 통해 가려놓았습니다.
-
-```jsx
-const shareKakao = ({ title, description, imageUrl, url, campaign }) => {
+```tsx
+const shareKakao = ({ title, description, imageUrl, url }) => {
   if (typeof window.Kakao !== 'undefined') {
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
@@ -69,23 +64,63 @@ const shareKakao = ({ title, description, imageUrl, url, campaign }) => {
 export default shareKakao;
 ```
 
-- 이 코드를 사용하면 카카오톡 공유 기능에서 문제가 생기거나 변경 사항이 있을 때, 이 코드만 수정하면 이를 사용하는 모든 코드에 자동으로 반영됩니다. 이렇게 하면 외부 라이브러리와의 의존성을 최소화하고, 유지보수성을 향상시킬 수 있습니다.
+위 코드를 통해 카카오 API가 변경되더라도 이 함수만 수정하면 됩니다. 이를 사용하는 코드들은 변경할 필요가 없으므로, 외부 라이브러리와의 의존성을 최소화하면서도 유지보수성을 높일 수 있습니다.
 
 <br />
 
 ### 다른 추상화 벽의 예시
 
-추상화 벽은 다양한 개발 도구와 프레임워크에서도 활용됩니다. 아래는 그 예시입니다.
+추상화 벽은 외부 라이브러리뿐만 아니라 다양한 개발 도구와 프레임워크에서도 사용됩니다. 이런 도구들은 복잡한 내부 구현을 감추고, 사용자가 간단한 인터페이스를 통해 필요한 작업을 할 수 있도록 도와줍니다. 대표적인 두 가지 예시를 살펴보겠습니다.
 
-1. React의 Virtual DOM
+**React의 Virtual DOM**
 
-- React는 Virtual DOM을 사용하여 추상화 벽을 만들어 놓았습니다. 이를 통해 실제 DOM을 직접 조작하는 대신, Virtual DOM을 사용하여 UI를 효율적으로 업데이트할 수 있습니다.
-- ex) `useState, setState`
+React는 Virtual DOM을 통해 추상화 벽을 형성하여 실제 DOM을 직접 조작하는 복잡성을 사용자에게 감추고 있습니다.
+Virtual DOM은 UI를 효율적으로 업데이트하는 방식으로, 개발자는 DOM 조작을 신경 쓰지 않고도 상태 변화에 따라 자동으로 UI가 반영되도록 설계할 수 있습니다.
+즉, 실제 DOM을 직접 다루는 대신 Virtual DOM이 중간에서 역할을 하기 때문에, 개발자는 상태 변경에만 집중하면 됩니다.
 
-2. Redux의 상태 관리
+```tsx
+const [count, setCount] = useState(0);
 
-- Redux는 상태 관리 라이브러리로서 상태 변경을 위한 함수들만 노출시켜 추상화 벽을 제공합니다. 이로 인해 애플리케이션 전체에서 상태를 일관성 있게 관리할 수 있습니다.
-- ex) `createStore, dispatch`
+return <button onClick={() => setCount(count + 1)}>{count}</button>;
+```
+
+위 코드에서 `useState`와 `setState`는 상태를 관리하면서 UI를 업데이트하지만, 실제로 DOM을 직접 변경하지는 않습니다.
+React는 상태 변화에 맞춰 Virtual DOM을 비교(diffing)하고, 필요한 부분만 실제 DOM에 반영하는 방식으로 UI를 최적화합니다
+
+**Redux의 상태 관리**
+
+Redux는 상태 관리 라이브러리로, 애플리케이션 전체의 상태를 중앙에서 일관되게 관리할 수 있도록 도와줍니다.
+Redux는 **액션(action)**과 **리듀서(reducer)**라는 개념을 통해 상태 변경 로직을 추상화합니다.
+개발자는 상태가 변경될 때마다 직접적인 상태 조작을 하지 않고, `dispatch`를 통해 액션을 전달하면 리듀서가 알아서 상태를 변경해줍니다.
+이 과정에서 상태가 어떻게 변경되는지에 대한 복잡한 구현은 추상화되어 감춰집니다.
+
+```tsx
+import { createStore } from 'redux';
+
+const initialState = { count: 0 };
+
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+const store = createStore(counterReducer);
+
+store.dispatch({ type: 'INCREMENT' });
+console.log(store.getState()); // { count: 1 }
+```
+
+위 코드에서 Redux는 상태 변경을 위한 추상화된 인터페이스만 제공합니다. 상태를 직접 수정하지 않고, `dispatch`와 리듀서를 통해 상태를 안전하게 관리할 수 있습니다. 이 방식은 복잡한 상태 관리를 추상화하여 애플리케이션 전체에서 일관성을 유지하도록 돕습니다.
+
+<br />
+
+### 2. 의존성 버전 고정 (Dependency Version Locking)
 
 <br />
 
