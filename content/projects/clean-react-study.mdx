@@ -1459,6 +1459,246 @@ export default SomeComponent;
 - 개발을 할 때 규칙을 가지고 개발을 진행하자.(컨벤션 설정)
 
 <br />
+<br />
+
+# ✅ Rendering
+
+## 1. JSX에서의 공백 처리
+
+```tsx
+// ❌
+export default function App() {
+  return (
+    <div>
+      Welcome Clean Code&nbsp;
+      <a href='clean-code-js'>Go Clean Code</a>
+    </div>
+  );
+}
+
+// ✅
+export default function App() {
+  return (
+    <div>
+      Welcome Clean Code <a href='clean-code-js'>Go Clean Code</a>
+    </div>
+  );
+}
+```
+
+- JSX에서 공백 처리는 가독성과 유지보수성을 위해 중요한데, `&nbsp;` 같은 HTML 엔터티는 복잡성을 증가시킴.
+- 대신 문자열 사이에 자연스럽게 공백을 넣는 것이 더 나은 방식.
+- 만약 여러 줄에 걸친 텍스트에서 공백을 조정해야 한다면, CSS로 `margin`이나 `padding`을 사용하는 것도 하나의 방법
+
+<br />
+<br />
+
+## 2. '0'값은 JSX에서 유효한 값
+
+### 🌈 결론
+
+```tsx
+export default function App() {
+	const [items, setItems] = useState([]);
+
+	// ❌
+  // 만약 item.length가 0이면 아래 0 출력됨
+	return (
+		<div>
+			{item.length && item.map((item) => {
+				return <Item item={item} />;
+			})
+		</div>
+	)
+
+	// ✅
+	return (
+		<div>
+			{item.length === 0 && item.map((item) => {
+				return <Item item={item} />;
+			})
+		</div>
+	)
+}
+```
+
+- `&&` 연산자는 첫 번째 값이 `참`일 때만 두 번째 값을 실행함
+- 만약 `거짓`이면 첫 번째 값이 출력 됨
+
+### ✍️ 내용
+
+- 참과 거짓으로 판단하는 것이 아니라, `렌더링 유무`로 판단.
+- JSX에서는 어떤 값은 유효한 값인지, 렌더링 하는 값인지 확인.
+- 렌더링을 조건부로 할 때에는 명확한 조건 필요.
+
+### ⭐️ 요약
+
+- JSX에서 렌더링되는 값과 아닌 값을 구분하자
+
+<br />
+<br />
+
+## 3. List 내부에서 Key
+
+### 🌈 결론
+
+```tsx
+export default function App({ list }) {
+	const handleAddItem = (value) => {
+		setItems((prev) => [
+			...prev,
+			{
+				id: crypto.randomUUID(),
+				value
+			},
+		]);
+	}
+
+	useEffect(() => {
+		// list만들 때! 꼭 ID를 부여하자
+		// 혹은 새로운 아이템을 추가하는 함수륾 만들 때 그 때 고유한 값을 넣어주자!
+	}, [])
+
+	// ❌
+	return (
+		<ul>
+			{list.map((item) => {
+				return <li>{item}</li>;
+			})
+		</div>
+	)
+
+	// ❌
+	return (
+		<ul>
+			{list.map((item, index) => {
+				return <li key={index}>{item}</li>;
+			})
+		</div>
+	)
+
+	// 🤔
+	return (
+		<ul>
+			{list.map((item, index) => {
+				return <li key={'card-item-' + index}>{item}</li>;
+			})
+		</div>
+	)
+
+	// ❌
+	// - state, props에 따라 렌더링이 될 때마다 key가 만들어짐
+	// - 그래서 유효한 값이 아님
+	return (
+		<ul>
+			{list.map((item, index) => {
+				return <li key={new Date().toString()}>{item}</li>;
+			})
+		</div>
+	)
+
+	// ❌
+	return (
+		<ul>
+			{list.map((item, index) => {
+				return <li key={uuidv4() onClick={() => handleDelete(uuidv4()}}>{item}</li>;
+			})
+		</div>
+	)
+
+	// ✅
+	return (
+		<ul>
+			{list.map((item) => {
+				return <li key={item.id}>{item}</li>;
+			})
+		</div>
+	)
+}
+```
+
+### ✍️ 내용
+
+- List 컴포넌트를 만들 때, key props를 넣어야 추후, 리렌더링시, DOM업데이트 여부 판단 가능
+- 이 때, key는 고유한 값이여야 함(단, 동적으로 생성되는 즉, 렌더링마다 생성되는 key를 넣으면 안됨)
+
+### ⭐️ 요약
+
+- List 컴포넌트를 작성할 때, 고유한 key를 props로 전달하자.
+
+<br />
+<br />
+
+## 4. 안전하게 Raw HTML 다루기
+
+### 🌈 결론
+
+React 에서 HTML과 악성 스크립트를 심을 수 있는 경우를 대비해 아래의 방법으로 대처하자.
+
+- [DOMPurify](https://github.com/cure53/DOMPurify), [HTML Sanitizer API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API), [eslint-plugin-risxss](https://www.npmjs.com/package/eslint-plugin-risxss?activeTab=readme)
+
+### ✍️ 내용
+
+React에서 Raw HTML을 다룰 때 XSS(악성 스크립트 공격)로부터 보호하는 것이 매우 중요. 이를 위해 다음과 같은 방법을 사용할 수 있음.
+
+```tsx
+import DOMPurify from 'dompurify';
+
+const SERVER_DATA = '<p>some raw html</p>';
+
+function DangerouslySetInnerHTMLExample() {
+  const post = {
+    // 🔥 XSS(악성 스크립트 공격) 예시
+    content: `<img src="" onerror='alert("you were hacked")'>`,
+  };
+
+  // HTML 데이터의 정제를 위해 DOMPurify 사용
+  const sanitizeContent = { __html: DOMPurify.sanitize(SERVER_DATA) };
+
+  // ❌ XSS에 매우 취약한 방법
+  // return <div>{markup}</div>;
+
+  // ✅ DOMPurify로 정제한 데이터를 사용하는 방법 (안전)
+  return <div dangerouslySetInnerHTML={sanitizeContent} />;
+}
+```
+
+### 유저가 수정할 수 있는 콘텐츠
+
+유저가 입력하거나 수정할 수 있는 데이터(예: input, textarea)에서 악성 스크립트가 실행되는 것을 방지해야 함. 유저 입력 데이터를 처리할 때는 항상 정제 과정을 거치고, HTML 태그가 아니라 순수 문자열로 저장하도록 주의해야 함.
+
+```tsx
+function UserContentInput() {
+  const [userContent, setUserContent] = useState('');
+
+  return (
+    <textarea
+      value={DOMPurify.sanitize(userContent)}
+      onChange={(e) => setUserContent(DOMPurify.sanitize(e.target.value))}
+    />
+  );
+}
+```
+
+### 사용 가능한 도구들
+
+1. `DOMPurify`
+
+   - DOMPurify는 HTML을 정제해 XSS 공격을 방지하는 인기 있는 라이브러리이다. 사용법이 간단하고 다양한 옵션을 제공한다.
+
+2. `HTML Sanitizer API`
+
+   - HTML Sanitizer API는 웹 표준으로 제안된 기능이며, HTML을 안전하게 정제할 수 있지만, 현재 지원하는 브라우저가 제한적이다. 실험적인 기능이므로 현재는 DOMPurify와 같은 라이브러리와 병행하여 사용하는 것이 좋다.
+
+3. `eslint-plugin-risxss`
+
+   - ESLint 플러그인은 코드 작성 중에 발생할 수 있는 XSS 취약점을 감지하고 경고해주는 도구이다. 프로젝트의 보안을 강화할 수 있는 유용한 도구이다.
+
+### ⭐️ 요약
+
+- React에서 HTML을 다룰 때에는 조심해야 함
+
+<br />
 
 ### 참고
 
