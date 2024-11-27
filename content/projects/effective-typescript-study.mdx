@@ -494,11 +494,11 @@ published: true
 
 <br />
 
-## ✏️ 아이템 10 : 객체 래퍼 타입 피하기
+## 아이템 10 : 객체 래퍼 타입 피하기
 
 1. JS는 기본형과 객체 타입을 서로 자유롭게 변환 가능(래퍼 객체)
-2. string 기본형과 String 래퍼 객체가 항상 동일하게 동작하는 것은 아님
-   - String 객체는 오직 자기 자신하고만 동일하다
+2. `string` 기본형과 `String 래퍼 객체`가 항상 동일하게 동작하는 것은 아님
+   - `String 객체`는 오직 자기 자신하고만 동일하다
      ```ts
      'hello' === new String('hello'); // false
      new String('hello') === new String('hello'); // false
@@ -511,7 +511,7 @@ published: true
      return ['hello', 'good day'].includes(phrase);
    }
    ```
-   - string은 String에 할당할 수 있지만, String은 string에 할당할 수 없음
+   - `string`은 `String 래퍼 객체`에 할당할 수 있지만, `String 래퍼 객체`은 `string`에 할당할 수 없음
    - TS가 제공하는 타입 선언은 전부 기본형 타입
 
 <br />
