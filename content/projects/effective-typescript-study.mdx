@@ -768,53 +768,56 @@ published: true
 
 <br />
 
-## ✏️ 아이템 14: 타입 연산과 제너릭 사용으로 반복 줄이기
+## 아이템 14: 타입 연산과 제너릭 사용으로 반복 줄이기
 
 1. 타입에 이름 붙이기
 
    - 타입이 반복적으로 등장하는 함수
 
-   ```ts
-   function distance(a: { x: number; y: number }, b: { x: number; y: number }) {
-     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-   }
-   ```
+     ```ts
+     function distance(
+       a: { x: number; y: number },
+       b: { x: number; y: number }
+     ) {
+       return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+     }
+     ```
 
    - 타입에 이름을 붙여 개선하기
 
-   ```ts
-   interface Point2D {
-     x: number;
-     y: number;
-   }
+     ```ts
+     interface Point2D {
+       x: number;
+       y: number;
+     }
 
-   function distance(a: Point2D, b: Point2D) {
-     /* ... */
-   }
-   ```
+     function distance(a: Point2D, b: Point2D) {
+       /* ... */
+     }
+     ```
 
 2. 함수의 타입 시그니처 개선하기
 
    - 몇몇 함수가 같은 타입 시그니처를 공유하는 경우
 
-   ```ts
-   function get(url: string, opts: Options): Promise<Response> {
-     /* ... */
-   }
+     ```ts
+     function get(url: string, opts: Options): Promise<Response> {
+       /* ... */
+     }
 
-   function post(url: string, opts: Options): Promise<Response> {
-     /* ... */
-   }
-   ```
+     function post(url: string, opts: Options): Promise<Response> {
+       /* ... */
+     }
+     ```
 
    - 해당 시그니처를 명명된 타입으로 분리하기
 
-   ```ts
+     ```ts
       type HTTPFunction = (url: string, opts: Options) => Promise<Response>;
 
       function get: HTTPFunction = (url, opts) => { /* ... */ }
       function post: HTTPFunction = (url, opts) => { /* ... */ }
-   ```
+     ```
 
 3. 인터페이스를 확장하여 반복 제거하기
 
@@ -833,7 +836,7 @@ published: true
    ```ts
    type PersonWithBirthDate = Person & { birth: Date };
    ```
-5. 전체 애플리케이션의 상태를 표현하는 State 타입과 부분만 표현하는 TopNavState 합치기
+5. 전체 애플리케이션의 상태를 표현하는 `State` 타입과 부분만 표현하는 `TopNavState` 합치기
 
    ```ts
    interface State {
@@ -852,17 +855,17 @@ published: true
 
    - 매핑된 타입 사용하기
 
-   ```ts
-   type TopNavState = {
-     [k in 'userId' | 'pageTitle' | 'recentFiles']: State[k];
-   };
-   ```
+     ```ts
+     type TopNavState = {
+       [k in 'userId' | 'pageTitle' | 'recentFiles']: State[k];
+     };
+     ```
 
-   - 유틸 타입 Pick 사용하기
+   - 유틸 타입 `Pick` 사용하기
 
-   ```ts
-   type TopNavState = Pick<State, 'userId' | 'pageTitle' | 'recentFiles'>;
-   ```
+     ```ts
+     type TopNavState = Pick<State, 'userId' | 'pageTitle' | 'recentFiles'>;
+     ```
 
 6. 태그된 유니온에서 인덱싱하기
 
@@ -897,17 +900,17 @@ published: true
    }
    ```
 
-   - 매핑된 타입과 keyof 사용하기
+   - 매핑된 타입과` keyof` 사용하기
 
-   ```ts
-   type OptionsUpdate = { [k in keyof Options]?: Options[k] };
-   ```
+     ```ts
+     type OptionsUpdate = { [k in keyof Options]?: Options[k] };
+     ```
 
-   - 유틸 타입 Partial 사용하기
+   - 유틸 타입 `Partial` 사용하기
 
-   ```ts
-   type OptionsUpdate = Partial<Options>;
-   ```
+     ```ts
+     type OptionsUpdate = Partial<Options>;
+     ```
 
 8. 값의 형태를 타입의 형태로 전환하는 방법
 
@@ -930,33 +933,33 @@ published: true
    }
    // 추론된 반환 타입은 { userId: string; name: string; age: number, ... };
    ```
-   - ReturnType 제네릭 사용하기
+   - `ReturnType` 제네릭 사용하기
      ```ts
      type UserInfo = ReturnType<typeof getUserInfo>;
      ```
 10. 제너릭 타입에서 매개변수 제한하기
 
-```ts
-interface Name {
-  first: string;
-  last: string;
-}
+    ```ts
+    interface Name {
+      first: string;
+      last: string;
+    }
 
-type DancingDuo<T extends Name> = [T, T];
+    type DancingDuo<T extends Name> = [T, T];
 
-const couple1: DancingDuo<{ first: string }> = [
-  { first: 'Kay' },
-  { first: 'Su' },
-]; // 🚨 에러
+    const couple1: DancingDuo<{ first: string }> = [
+      { first: 'Kay' },
+      { first: 'Su' },
+    ]; // 🚨 에러
 
-// extends를 사용하여 Pick의 정의 완성하기
-type Pick<T, K extends keyof T> = {
-  [k in K]: T[k];
-};
+    // extends를 사용하여 Pick의 정의 완성하기
+    type Pick<T, K extends keyof T> = {
+      [k in K]: T[k];
+    };
 
-type FirstLast = Pick<Name, 'first' | 'last'>; // 정상
-type FirstMiddle = Pick<Name, 'first' | 'middle'>; // 🚨 에러
-```
+    type FirstLast = Pick<Name, 'first' | 'last'>; // 정상
+    type FirstMiddle = Pick<Name, 'first' | 'middle'>; // 🚨 에러
+    ```
 
 <br />
 
