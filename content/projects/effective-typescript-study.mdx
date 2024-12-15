@@ -1336,41 +1336,41 @@ published: true
 
 <br />
 
-## ✏️ 아이템 23: 한꺼번에 객체 생성하기
+## 아이템 23: 한꺼번에 객체 생성하기
 
 1. TS의 타입은 일반적으로 변경되지 않음. 따라서 객체를 생성할 때는 속성을 하나씩 추가하기보다는 여러 속성을 포함해서 한꺼번에 생성해야 타입 추론에 유리
-2. 객체를 제 각각 나눠야 한다면, 타입 단언문(as)을 사용
+2. 객체를 제 각각 나눠야 한다면, 타입 단언문(`as`)을 사용
 
-```ts
-interface Point {
-  x: number;
-  y: number;
-}
+   ```ts
+   interface Point {
+     x: number;
+     y: number;
+   }
 
-const pt = {} as Point;
-pt.x = 3;
-pt.y = 4; // 정상
-```
+   const pt = {} as Point;
+   pt.x = 3;
+   pt.y = 4; // 정상
+   ```
 
-- 객체 전개 연산자(...) 사용
+   - 객체 전개 연산자(`...`) 사용
 
 3. 선택적 필드 방식으로 표현
 
-```ts
-function addOptional<T extends object, U extends object>(
-  a: T,
-  b: U | null
-): T & Partial<U> {
-  return { ...a, ...b };
-}
+   ```ts
+   function addOptional<T extends object, U extends object>(
+     a: T,
+     b: U | null
+   ): T & Partial<U> {
+     return { ...a, ...b };
+   }
 
-const nameTitle = { name: 'Kay', title: 'Dev' };
+   const nameTitle = { name: 'Kay', title: 'Dev' };
 
-const ko = addOptional(
-  nameTitle,
-  hasDates ? { start: -1589, end: -1566 } : null
-);
-```
+   const ko = addOptional(
+     nameTitle,
+     hasDates ? { start: -1589, end: -1566 } : null
+   );
+   ```
 
 <br />
 
