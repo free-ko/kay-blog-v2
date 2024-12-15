@@ -1272,67 +1272,67 @@ published: true
 
 <br />
 
-## ✏️ 아이템 22: 타입 좁히기
+## 아이템 22: 타입 좁히기
 
 1. 분기문에서 예외를 던지거나, 함수를 반환하여 블록의 나머지 부분에서 변수의 타입 좁히기
 2. `instanceof` 으로 타입 좁히기
 3. 속성 체크로 타입 좁히기
 
-```ts
-interface A {
-  a: number;
-}
+   ```ts
+   interface A {
+     a: number;
+   }
 
-interface B {
-  b: number;
-}
+   interface B {
+     b: number;
+   }
 
-function pickAB(ab: A | B) {
-  if ('a' in ab) {
-    ab; // 타입이 A
-  } else {
-    ab; // 타입이 B
-  }
-  ab; // 타입이 a | B
-}
-```
+   function pickAB(ab: A | B) {
+     if ('a' in ab) {
+       ab; // 타입이 A
+     } else {
+       ab; // 타입이 B
+     }
+     ab; // 타입이 a | B
+   }
+   ```
 
 4. `Array.isArray` 등의 내장 함수로 타입 좁히기
-5. null 체크 시 `typeof null === 'object'`가 됨
-6. 명시적 ‘태그’ 붙이기 (tagged union)
+5. `null` 체크 시 `typeof null === 'object'`가 됨
+6. 명시적 `태그` 붙이기 (`tagged union`)
 
-```ts
-function handleEvent(e: AppEvent) {
-  switch (e.type) {
-    case 'download':
-      e;
-      break;
-    case 'upload':
-      e;
-      break;
-  }
-}
-```
+   ```ts
+   function handleEvent(e: AppEvent) {
+     switch (e.type) {
+       case 'download':
+         e;
+         break;
+       case 'upload':
+         e;
+         break;
+     }
+   }
+   ```
 
 7. TS를 돕기 위해 커스텀 함수 도입(사용자 정의 타입 가드)
 
-```ts
-function isInputElement(el: HTMLElement): el is HTMLInputElement {
-  return 'value' in el;
-}
-```
+   ```ts
+   function isInputElement(el: HTMLElement): el is HTMLInputElement {
+     return 'value' in el;
+   }
+   ```
 
 8. 배열에서 `undefined` 걸러내기
 
-```ts
-function isDefined<T>(x: T | undefined): x is T {
-  return x !== undefined;
-}
+   ```ts
+   function isDefined<T>(x: T | undefined): x is T {
+     return x !== undefined;
+   }
 
-const members = ['Janet', 'Michael']
-  .map((who) => jackson5.find((n) => n === who))
-  .filter(isDefined); // 타입이 string[]
-```
+   const members = ['Janet', 'Michael']
+     .map((who) => jackson5.find((n) => n === who))
+     .filter(isDefined); // 타입이 string[]
+   ```
 
 <br />
 
