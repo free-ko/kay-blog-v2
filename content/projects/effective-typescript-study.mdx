@@ -1374,44 +1374,44 @@ published: true
 
 <br />
 
-## ✏️ 아이템 24: 일관성 있는 별칭 사용하기
+## 아이템 24: 일관성 있는 별칭 사용하기
 
 1. 별칭을 남발하면 제어 흐름을 분석하기 어려움
 2. 객체의 속성을 별칭에 할당하면 `strictNullChecks`에서 걸릴 위험이 있음
 
-```ts
-interface Polygon {
-  exterior: Coordinate[];
-  holes: Coordinate[][];
-  bbox?: BoundingBox;
-}
+   ```ts
+   interface Polygon {
+     exterior: Coordinate[];
+     holes: Coordinate[][];
+     box?: BoundingBox;
+   }
 
-// 속성 체크는 polygon.bbox의 타입을 정제했지만 box는 그렇지 않음
-function isPointInPolygon(polygon: Polygon, pt: Coordinate) {
-  polygon.bbox; // 타입이 BoundingBox | undefined
-  const box = polygon.bbox;
-  box; // 타입이 BoundingBox | undefined
-  if (polygon.bbox) {
-    polygon.bbox; // 타입이 BoundingBox
-    box; // 타입이 BoundingBox | undefined
-  }
-}
+   // 속성 체크는 polygon.box의 타입을 정제했지만 box는 그렇지 않음
+   function isPointInPolygon(polygon: Polygon, pt: Coordinate) {
+     polygon.box; // 타입이 BoundingBox | undefined
+     const box = polygon.box;
+     box; // 타입이 BoundingBox | undefined
+     if (polygon.box) {
+       polygon.box; // 타입이 BoundingBox
+       box; // 타입이 BoundingBox | undefined
+     }
+   }
 
-// 객체 비 구조화 할당 이용
-function isPointInPolygon(polygon: Polygon, pt: Coordinate) {
-  const { bbox } = polygon;
-  if (bbox) {
-    const { x, y } = bbox;
-    // ...
-  }
-}
+   // 객체 비 구조화 할당 이용
+   function isPointInPolygon(polygon: Polygon, pt: Coordinate) {
+     const { box } = polygon;
+     if (box) {
+       const { x, y } = box;
+       // ...
+     }
+   }
 
-// 객체 비구조화 이용 시 주의사항
-// - 전체 bbox 속성이 아니라 x와 y가 선택적 속성일 경우 속성 체크가 더 필요 함
-// - bbox에는 선택적 속성이 적합했지만 holes에는 그렇지 않음
-// - 런타임에도 혼동을 야기할 가능성
-// - 속성보다 지역 변수 사용
-```
+   // 객체 비구조화 이용 시 주의사항
+   // - 전체 box 속성이 아니라 x와 y가 선택적 속성일 경우 속성 체크가 더 필요 함
+   // - box에는 선택적 속성이 적합했지만 holes에는 그렇지 않음
+   // - 런타임에도 혼동을 야기할 가능성
+   // - 속성보다 지역 변수 사용
+   ```
 
 <br />
 
