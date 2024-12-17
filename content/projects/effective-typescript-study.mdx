@@ -1415,14 +1415,14 @@ published: true
 
 <br />
 
-## ✏️ 아이템 25: 비동기 코드에는 콜백 대신 async 함수 사용하기
+## 아이템 25: 비동기 코드는 콜백 대신 async 함수 사용
 
 1. 과거 JS의 비동기 콜백 지옥 발생
-   - ES2015는 Promise 개념을 도입
-   - ES2017에서는 `async/await` 도입\
+   - ES2015는 `Promise` 개념을 도입
+   - ES2017에서는 `async/await` 도입
    - TS 런타임에 관계없이 `async/await` 사용 가능
    - TS의 프로미스 반환 타입은 `Promise<Response>`
-2. 일반적으로 프로미스보다는 `async/await`을 권장
+2. 일반적으로 `Promise`보다는 `async/await`을 권장
    - 더 간결하고 직관적
    - `async` 함수는 항상 프로미스를 반환하도록 강제 됨
    ```ts
@@ -1433,36 +1433,38 @@ published: true
    ```
 3. 콜백이나 프로미스를 사용하면 실수로 반(half)동기 코드를 작성할 수 있지만, `async`를 사용하면 항상 비동기 코드를 작성할 수 있음
 
-```ts
-const _cache: { [url: string]: string } = {};
-async function fetchWithCache(url: string) {
-  if (url in _cache) {
-    return _cache[url];
-  }
-  const response = await fetch(url);
-  const text = await response.text();
-  _cache[url] = text;
-  return text;
-}
+   ```ts
+   const _cache: { [url: string]: string } = {};
 
-let requestStatus: 'loading' | 'success' | 'error';
-async function getUser(userId: string) {
-  requestStatus = 'loading';
-  const profile = await fetchWithCache(`/user/${userId}`);
-  requestStatus = 'success';
-}
-```
+   async function fetchWithCache(url: string) {
+     if (url in _cache) {
+       return _cache[url];
+     }
+     const response = await fetch(url);
+     const text = await response.text();
+     _cache[url] = text;
+     return text;
+   }
 
-4. `async` 함수에서 프로미스를 반환하면 반환 타입은 `Promise<Promise<T>>`가 아닌 `Promise<T>`가 됨
+   let requestStatus: 'loading' | 'success' | 'error';
 
-```ts
-// function getJSON(url: string): Promise<any>
-async function getJSON(url: string) {
-  const response = await fetch(url);
-  const jsonPromise = response.json(); // 타입이 Promise<any>
-  return jsonPromise;
-}
-```
+   async function getUser(userId: string) {
+     requestStatus = 'loading';
+     const profile = await fetchWithCache(`/user/${userId}`);
+     requestStatus = 'success';
+   }
+   ```
+
+4. `async` 함수에서 프로미스를 반환하면 반환 타입은 `Promise<Promise<T>>`가 아닌, `Promise<T>`가 됨
+
+   ```ts
+   // function getJSON(url: string): Promise<any>
+   async function getJSON(url: string) {
+     const response = await fetch(url);
+     const jsonPromise = response.json(); // 타입이 Promise<any>
+     return jsonPromise;
+   }
+   ```
 
 <br />
 
