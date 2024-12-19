@@ -1543,23 +1543,23 @@ published: true
 
 <br />
 
-## ✏️ 아이템 27: 함수형 기법과 라이브러리로 타입 흐름 유지하기
+## 아이템 27: 함수형 기법과 라이브러리로 타입 흐름 유지
 
 1. 함수형 프로그래밍을 지원하는 최근의 라이브러리
-   - ex) map, flatMap, filter, reduce 등
+   - ex) `map, flatMap, filter, reduce` 등
    - 타입 정보가 그대로 유지되면서 타입 흐름(flow)이 계속 전달 됨
-2. lodash의 Dictionary 타입
+2. lodash의 `Dictionary` 타입
 
-```ts
-// 타입이 _.Dictionary<string>[]
-const rows = rawRows
-  .slice(1)
-  .map((rowStr) => _.zipObject(headers, rowStr.split(',')));
-```
+   ```ts
+   // 타입이 _.Dictionary<string>[]
+   const rows = rawRows
+     .slice(1)
+     .map((rowStr) => _.zipObject(headers, rowStr.split(',')));
+   ```
 
-    - `Dictionary<string>`은 `{[key: string]: string}` 또는 `Record<string, string>`과 동일
+   - `Dictionary<string>`은 `{[key: string]: string}` 또는 `Record<string, string>`과 동일
 
-3. flat 메서드
+3. `flat` 메서드
 
    - `T[][] => T[]`
 
