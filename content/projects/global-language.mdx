@@ -1,0 +1,185 @@
+---
+title: '다국어 셋팅'
+description: Next App Router 프로젝트에서 다국어 셋팅 방법을 알아보자.
+date: '2024-12-22 18:24:00'
+published: true
+---
+
+# Next 프로젝트 다국어 기능 구현하기
+
+## 1. Next.js 프로젝트에서 다국어 기능 구현
+
+다국어 기능은 글로벌 서비스를 개발할 때 중요한 부분입니다. Next.js는 App Router와 Page Router를 통해 다국어 라우팅을 지원하지만, 각 방식에 따라 구현 방법과 장단점이 다릅니다. 이번 프로젝트에서는 App Router를 활용하여 다국어 환경을 구축하였고, 과정에서 발생한 문제와 해결 방법을 공유드리고자 합니다.
+
+### Page Router와 App Router 비교
+
+| **항목**             | **Page Router (기존)**                                 | **App Router (현재)**                         |
+| -------------------- | ------------------------------------------------------ | --------------------------------------------- |
+| **Locale 처리 방식** | `next.config.js`의 `i18n` 설정으로 Next.js가 자동 처리 | `[locale]` 폴더를 명시적으로 사용해야 함      |
+| **URL 구조**         | `/en/products` (자동 처리)                             | `/en/products` (명시적 설정 필요)             |
+| **폴더 구조**        | 필요 없음                                              | `[locale]` 폴더가 필요                        |
+| **SEO 지원**         | 자동 처리                                              | 명시적 설정으로 가능                          |
+| **유연성**           | 제한적 (Next.js 설정에 의존)                           | 높음 (라우팅과 번역 구조를 커스터마이징 가능) |
+
+### Page Router의 특징
+
+**장점**
+
+- [`next.config.js`에서 i18n 설정](https://nextjs.org/docs/app/building-your-application/routing/internationalization)만으로 간단히 다국어 지원 가능.
+- Next.js가 언어별 URL을 자동으로 추가하여 SEO에 유리.
+
+**단점**
+
+- 라우팅 동작이 제한적이며, 특정 언어에만 맞춘 동적 라우팅이 어려움.
+
+### App Router의 특징
+
+**장점**
+
+- `[locale]` 폴더를 활용해 다국어 라우팅을 명시적으로 구성 가능.
+- URL과 번역 데이터 구조를 완전히 커스터마이징할 수 있어 유연함.
+
+**단점**
+
+- 초기 설정이 Page Router에 비해 복잡함.
+- 모든 라우트를 수동으로 구성해야 하므로 관리 비용이 증가할 수 있음.
+
+<br />
+
+## 2. 다국어 기능 구현을 위한 라이브러리 비교
+
+| **라이브러리**      | **특징**                                                      | **장점**                                                                                                   | **단점**                                                                  |
+| ------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **`react-i18next`** | `i18next`를 React 환경에서 쉽게 사용할 수 있도록 지원         | - 강력한 유연성과 고급 기능<br />- JSON, YAML 등 다양한 데이터 형식 지원<br />- 동적 번역 데이터 로드 가능 | 초기 설정이 복잡<br />번역 데이터를 로드하거나 관리할 때 추가 작업 필요   |
+| **`react-intl`**    | 국제화 표준(ECMA-402)을 기반으로 설계된 React 전용 라이브러리 | - 날짜, 숫자, 통화 포맷팅에 강점<br />- 설정이 간단                                                        | 동적 번역 데이터 처리 기능 부족<br />네임스페이스 관리가 어려움           |
+| **`next-i18next`**  | `react-i18next` 기반으로, Next.js 환경에 최적화된 라이브러리  | - Next.js SSR 및 SSG 지원<br />- SEO 친화적<br />- 설정이 간단                                             | Next.js 전용 라이브러리로, 다른 환경에서 사용 불가능<br />유연성이 제한적 |
+
+<br />
+
+## 3. App Router를 활용한 다국어 코드 설명
+
+### 3.1. 서버에서 번역 데이터 초기화
+
+`initTranslations` 함수는 서버에서 `i18next`를 초기화하고 번역 데이터를 설정하는 역할을 합니다. 서버에서 번역 데이터를 준비하고, 클라이언트로 전달합니다.
+
+    ```tsx
+    const initTranslations = async (
+      locale: string,
+      resources?: any
+    ): Promise<i18n> => {
+      const i18nInstance = createInstance();
+      i18nInstance.use(initReactI18next);
+
+      if (!resources) {
+        i18nInstance.use(
+          resourcesToBackend(
+            (language: string, namespace: string) =>
+              import(`../../../public/locales/${language}/${namespace}.json`)
+          )
+        );
+      }
+
+      await i18nInstance.init({
+        lng: locale,
+        fallbackLng: 'en',
+        ns: ['common'], // 서버에서 공통 네임스페이스만 로드
+        resources,
+      });
+
+      return i18nInstance;
+    };
+    ```
+
+### 3.2. 클라이언트에서 번역 데이터 초기화
+
+클라이언트에서는 서버에서 전달받은 번역 데이터를 활용해 `TranslationsProvider`를 통해 React Context로 번역 데이터를 전달합니다. 필요 시 클라이언트에서 동적으로 번역 데이터를 로드할 수도 있습니다.
+
+    ```tsx
+    'use client';
+
+    import { ReactNode } from 'react';
+    import { I18nextProvider } from 'react-i18next';
+    import { i18n } from 'i18next';
+
+    interface TranslationsProviderProps {
+      i18n: i18n; // 서버에서 전달된 인스턴스
+      children: ReactNode;
+    }
+
+    const TranslationsProvider = ({
+      i18n,
+      children,
+    }: TranslationsProviderProps) => {
+      return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
+    };
+
+    export default TranslationsProvider;
+    ```
+
+### 3.3. 서버와 클라이언트의 작업 분리
+
+- 서버: 공통 네임스페이스(`common`)만 준비하고, 이를 클라이언트에 전달.
+- 클라이언트: 추가적인 번역 데이터가 필요하면 `resourcesToBackend`를 통해 동적으로 로드.
+
+<br />
+
+## 클라이언트와 서버의 init 충돌 문제와 해결
+
+### 문제 상황
+
+처음에는 서버에서 `initTranslations`을 호출하여 번역 데이터를 초기화한 뒤, 클라이언트에서 이를 전달받아 사용하는 방식으로 구현했습니다.
+그러나 클라이언트에서 다시 `init`을 호출하는 것이 중복 작업이라 판단하여 클라이언트의 `init`을 제거했더니 `Maximum call stack size exceeded` 에러가 발생하였습니다.
+
+### 문제 원인 분석
+
+1. React Context와 상태 불일치
+
+- `React의 hydration` 과정에서 클라이언트가 서버로부터 받은 `i18nInstance`를 사용하는데, `i18next` 내부 상태가 초기화되지 않았거나 클라이언트와 일치하지 않을 때 문제가 발생합니다.(클라이언트에서 `t` 함수 호출 시 `React`의 재렌더링이 무한 루프를 유발)
+
+2. `TranslationsProvider`의 렌더링 구조
+
+- `TranslationsProvider`가 받은 `i18nInstance`가 React의 상태 변화에 의해 루프를 발생시킬 가능성이 있습니다.(서버에서 초기화한 인스턴스가 클라이언트에서 재활용될 때 상태 동기화 문제 발생.
+  )
+
+3. `i18next`의 이벤트 중복 등록
+
+- `i18next`는 내부적으로 이벤트를 관리하는데, 서버에서 전달받은 인스턴스를 클라이언트에서 추가로 초기화하지 않을 경우 중복된 이벤트 핸들러가 무한 호출됩니다.
+
+### 해결 방법
+
+클라이언트에서도 `createInstance`를 호출하고, 서버에서 전달된 리소스를 기반으로 `i18next` 상태를 초기화하도록 설계했습니다. 이를 통해 React와 `i18next` 상태를 동기화했습니다.
+
+<br />
+
+## 4. 요약 및 배운 점
+
+### 4.1. 요약
+
+1. Page Router와 App Router 비교
+
+- `Page Router`는 간단하지만 유연성이 부족하며, `App Router`는 설정이 복잡하지만 커스터마이징이 쉬움.
+
+2. 라이브러리 선택
+
+- 복잡한 다국어 요구사항 → `react-i18next`
+- 간단한 포맷팅 중심 → `react-intl`
+- `Next.js` 전용 → `next-i18next`
+
+3. 코드 설계
+
+- 서버에서 공통 네임스페이스만 준비.
+- 클라이언트에서 필요한 네임스페이스를 동적으로 로드.
+
+### 4.2 배운 점
+
+- **서버와 클라이언트의 역할 분리**: Next 14는 서버와 클라이언트 컴포넌트를 유연하게 개발할 수 있는 환경을 제공했기 때문에 서버는 공통 데이터만 준비하고, 클라이언트는 동적으로 언어 JSON 데이터를 로드하는 방식을 선택함으로써 효율적인 설계 경험을 배웠습니다.
+- **App Router의 유연성 활용**: `[locale]` 폴더 구조를 사용하면 언어별 URL 관리와 SEO 최적화를 쉽게 적용할 수 있었습니다.
+- **퍼포먼스 최적화 중요성**: 모든 번역 데이터를 서버에서 준비하지 않고 필요한 경우에만 로드하는 방식을 이해 및 적용하는 경험.
+- **React와 i18next의 상태 동기화**: 클라이언트에서도 상태를 초기화하여 React와 i18next 간 상태 불일치를 해결하는 것이 중요하다는 것을 배웠습니다.
+
+<br />
+
+## 참고
+
+- [Next App Routing 국제화](https://nextjs.org/docs/app/building-your-application/routing/internationalization)
+- [i18nexus Next App router 다국어 셋팅](https://i18nexus.com/tutorials/nextjs/react-i18next)

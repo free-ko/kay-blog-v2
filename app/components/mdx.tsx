@@ -117,7 +117,7 @@ const components = {
     <hr className='my-4 border-zinc-200 md:my-8' {...props} />
   ),
   table: ({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
-    <div className='w-full my-6 overflow-y-auto'>
+    <div className='w-full overflow-y-auto'>
       <table className={clsx('w-full', className)} {...props} />
     </div>
   ),
