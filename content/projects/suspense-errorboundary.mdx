@@ -1,0 +1,217 @@
+---
+title: 'Suspense와 ErrorBoundary'
+description: Suspense와 ErrorBoundary 함께 사용시 주의해야 할 부분을 알아보자.
+date: '2025-01-04 14:35:00'
+published: true
+---
+
+# Suspense와 ErrorBoundary의 관계
+
+React에서 컴포넌트를 비동기로 로딩하거나 에러를 처리하는 과정에서 `Suspense`와 `ErrorBoundary`는 매우 중요한 역할을 합니다.
+개발 중 `Suspense`와 `ErrorBoundary`를 함께 사용할 때, 에러를 적절히 처리하지 못하거나 무한 호출 문제가 발생하는 경험을 하게 되었습니다.
+이 문제를 해결하기 위해 학습한 내용을 기반으로 `Suspense`와 `ErrorBoundary`의 개념 및 특징을 정리하고,
+`Suspense`와 `ErrorBoundary`를 적절히 사용하는 방법에 대해 소개합니다.
+
+<br />
+<br />
+
+## **Suspense의 개념과 특징**
+
+### 1. Suspense란?
+
+- React의 내장 컴포넌트로, 비동기 컴포넌트 로딩 중에 대체 UI(fallback)를 표시하는 데 사용됩니다.
+- 주로 코드 스플리팅과 데이터 패칭을 관리하는 데 활용됩니다.
+
+### 2. 주요 특징
+
+- **로딩 상태 관리:** 비동기로 로드되는 컴포넌트가 준비될 때까지 `fallback` UI를 렌더링합니다.
+- **Promise 기반 작동:** `Suspense`는 내부적으로 `Promise`를 사용하여 로딩 상태를 처리합니다.
+- **React 18 이상에서 데이터 패칭 지원:** React 18부터는 [`useTransition`](https://react.dev/reference/react/useTransition)과 결합하여 더욱 강력한 데이터 패칭 경험을 제공합니다.
+
+  ```tsx
+  import React, { useState, useTransition, Suspense } from 'react';
+
+  // 가짜 API 호출 함수
+  const fetchData = (id: number) => {
+    return new Promise<string>((resolve) => {
+      setTimeout(() => resolve(`Fetched data for item ${id}`), 1000);
+    });
+  };
+
+  // 데이터 컴포넌트
+  const DataComponent = ({ id }: { id: number }) => {
+    const [data, setData] = useState<string | null>(null);
+
+    if (!data) {
+      throw fetchData(id).then(setData);
+    }
+
+    return <div>{data}</div>;
+  };
+
+  // 메인 컴포넌트
+  const App = () => {
+    const [currentId, setCurrentId] = useState(1);
+    const [isPending, startTransition] = useTransition();
+
+    const handleClick = (newId: number) => {
+      startTransition(() => {
+        setCurrentId(newId);
+      });
+    };
+
+    return (
+      <div>
+        <h1>Data Fetching with Suspense</h1>
+        <button disabled={isPending} onClick={() => handleClick(currentId + 1)}>
+          Load Next Item
+        </button>
+        {isPending && <p>Loading new data...</p>}
+        <Suspense fallback={<p>Loading...</p>}>
+          <DataComponent id={currentId} />
+        </Suspense>
+      </div>
+    );
+  };
+
+  export default App;
+  ```
+
+  - `useTransition` 사용: 버튼 클릭 시 `startTransition`을 호출하여 비동기 상태 전환을 관리합니다.
+  - `Suspense`로 로딩 상태 처리: `DataComponent`가 데이터를 로드하는 동안 `fallback`으로 대체 UI를 표시합니다.
+  - `throw Promise` 활용: 데이터 로드 중 `throw`를 사용해 `Suspense`와 연동합니다.
+
+### 3. 사용 예시
+
+```tsx
+<Suspense fallback={<Loading />}>
+  <LazyLoadedComponent />
+</Suspense>
+```
+
+- `LazyLoadedComponent`가 로드될 때까지 `Loading` 컴포넌트를 보여줍니다.
+
+<br />
+<br />
+
+## **ErrorBoundary의 개념과 특징**
+
+### 1. ErrorBoundary란?
+
+- React의 클래스 기반 컴포넌트로, **렌더링 중 발생하는 에러를 감지**하고 대체 UI를 렌더링합니다.
+- React 16부터 도입된 기능으로, 사용자 경험을 보호하는 데 중요한 역할을 합니다.
+
+### 2. 주요 특징
+
+- **렌더링 에러 감지**: `ErrorBoundary`는 자식 컴포넌트에서 발생한 렌더링 에러를 감지합니다.
+- **대체 UI 제공:** 에러 발생 시 사용자에게 에러 메시지나 대체 UI를 보여줍니다.
+- **비동기 코드와의 제한:** 비동기로 발생한 에러는 기본적으로 감지하지 못하며, 동기적 에러만 처리합니다.
+
+### 3. 사용 예시
+
+```tsx
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback />;
+    }
+    return this.props.children;
+  }
+}
+
+// 사용
+<ErrorBoundary>
+  <MyComponent />
+</ErrorBoundary>;
+```
+
+<br />
+<br />
+
+## **Suspense와 ErrorBoundary의 위치에 따른 차이점**
+
+`Suspense`와 `ErrorBoundary`는 각각 로딩 상태와 에러를 관리하는 역할을 담당합니다. 하지만 이들의 위치에 따라 동작 방식과 에러 처리 방식이 크게 달라질 수 있습니다. 아래에서는 두 컴포넌트의 위치를 다르게 설정했을 때의 차이점을 살펴보겠습니다.
+
+### **1. Suspense가 ErrorBoundary 밖에 있을 때**
+
+```tsx
+<Suspense fallback={<Loading />}>
+  <ErrorBoundary fallback={<ErrorFallback />}>
+    <LazyLoadedComponent />
+  </ErrorBoundary>
+</Suspense>
+```
+
+### **동작**
+
+- **Suspense가 로딩 상태를 처리**: `LazyLoadedComponent`가 비동기로 로딩될 때 `fallback` UI를 보여줍니다.
+- **ErrorBoundary가 에러를 처리**: 컴포넌트 렌더링 중 에러가 발생하면 `ErrorBoundary`의 `fallback` UI를 렌더링합니다.
+
+### **문제점**
+
+- **API 실패 시 무한 호출 발생 가능**:
+  - React는 `Promise`가 던져질 때, 이를 로딩 상태로 간주하고 다시 렌더링을 시도합니다.
+  - 하지만 `ErrorBoundary`는 `Suspense` 내부에서 발생하는 비동기 에러를 감지하지 못합니다.
+  - 결과적으로, API 호출 실패 상황에서 무한 재요청 문제가 발생할 수 있습니다.
+
+<br />
+<br />
+
+### **2. Suspense가 ErrorBoundary 안에 있을 때**
+
+```tsx
+<ErrorBoundary fallback={<ErrorFallback />}>
+  <Suspense fallback={<Loading />}>
+    <LazyLoadedComponent />
+  </Suspense>
+</ErrorBoundary>
+```
+
+### **동작**
+
+- **ErrorBoundary가 에러를 처리**: `LazyLoadedComponent` 로딩이나 렌더링 중 발생한 모든 에러를 감지하여 에러 UI를 보여줍니다.
+- **Suspense가 로딩 상태를 처리**: 컴포넌트가 성공적으로 로드될 때까지 로딩 상태 UI를 렌더링합니다.
+
+### **장점**
+
+- **API 실패 시 무한 호출 방지**:
+  - `ErrorBoundary`가 `Suspense` 내부의 모든 에러를 감지하고 처리하므로 무한 호출 문제가 발생하지 않습니다.
+- **책임 분리**:
+  - `Suspense`는 데이터 로딩에 집중하고, 에러 처리는 `ErrorBoundary`에 위임하여 설계가 더 명확해집니다.
+
+<br />
+<br />
+
+## **차이점 요약**
+
+| **위치**             | **Suspense가 ErrorBoundary <br /> 밖에 있을 때**              | **Suspense가 ErrorBoundary <br /> 안에 있을 때**   |
+| -------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
+| **에러 감지 위치**   | ErrorBoundary는 Suspense 내부에서 발생한 에러를 감지하지 못함 | ErrorBoundary가 Suspense 내부 에러를 감지하여 처리 |
+| **로딩 처리**        | Suspense가 로딩 UI를 처리함                                   | Suspense가 로딩 UI를 처리함                        |
+| **무한 호출 가능성** | API 실패 시 무한 호출 발생 가능                               | API 실패 시 무한 호출 방지                         |
+| **권장 사용 방식**   | 문제 발생 가능성이 높아 권장되지 않음                         | 더 안정적이고 예상 가능한 동작 제공                |
+
+<br />
+<br />
+
+## **결론**
+
+- 이번 학습을 통해 `Suspense는` 항상 `ErrorBoundary` 내부에 두는 것이 안정적이라는 사실을 알게 되었습니다.
+- 이렇게 하면 API 호출 실패와 같은 에러를 `ErrorBoundary`가 감지하여 적절히 처리하고, 무한 호출 문제를 방지할 수 있습니다.
+- `Suspense`는 데이터 로딩에 집중하고, 에러는 `ErrorBoundary`에 위임하는 구조가 효과적임을 확인했습니다.
+
+<br />
+<br />
