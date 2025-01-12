@@ -2669,7 +2669,7 @@ class userPosts {
         assertType<(a: number, b: number) => number>(double); //  정상?!
         ```
 
-      - Parameters와 ReturnType 제네릭 타입을 이용해, 함수의 매개변수 타입과 반환 타입만 분리하여 테스트할 수 있음
+      - `Parameters`와 `ReturnType` 제네릭 타입을 이용해, 함수의 매개변수 타입과 반환 타입만 분리하여 테스트할 수 있음
 
       ```ts
       const double = (x: number) => 2 * x;
@@ -2682,7 +2682,7 @@ class userPosts {
       assertType<number>(r); // 정상
       ```
 
-      - map의 콜백 함수에서 사용하게 되는 this 값에 대한 타입 선언 테스트
+      - `map`의 콜백 함수에서 사용하게 되는 `this` 값에 대한 타입 선언 테스트
 
       ```ts
       declare function map<U, V>(
@@ -2691,10 +2691,10 @@ class userPosts {
       ): V[];
       ```
 
-4.  타입 시스템 내에서 암시적 any 타입을 발견하기 위해 DefinitelyTyped의 타입 선언을 위한 도구 `tslint` 사용함
+4.  타입 시스템 내에서 암시적 `any` 타입을 발견하기 위해 `DefinitelyTyped`의 타입 선언을 위한 도구 `tslint` 사용함
 
     ```ts
-    // dtslint는 할당 가능성을 체크하는 대신 각 심벌의 타입을 추출하여 글자 자체가 같은지 비교한다
+    // tslint는 할당 가능성을 체크하는 대신 각 심벌의 타입을 추출하여 글자 자체가 같은지 비교한다
     const beatles = ['john', 'paul', 'george', 'ringo'];
 
     map(
