@@ -2879,14 +2879,14 @@ class userPosts {
 
 <br />
 
-## 아이템 56: 정보를 감추는 목적으로 private 사용하지 않기
+## 아이템 56: 정보를 감추는 목적으로 private 사용 X
 
-1. public, protected, private 같은 접근 제어자
+1. `public, protected, private` 같은 접근 제어자
    - TS 키워드기 때문에 컴파일 후에 제거 됨
 2. 심지어 단언문을 사용하면 TS 상태에서도 private 속성에 접근 가능
 
    ```ts
-   // 정보를 감추기 위해 private 을 사용하면 안 됨
+   // 정보를 감추기 위해 `private` 을 사용하면 안 됨
    class Diary {
      private secret = 'test';
    }
@@ -2916,8 +2916,8 @@ class userPosts {
    checker.checkPassword('s3cret'); // true
    ```
 
-4. 비공개 필드 (현재 표준화 진행중) 사용
-   - 접두사 #
+4. 비공개 필드 사용
+   - 접두사 `#`
    - 타입 체크와 런타임 모두에서 비공개
    - 클래스 외부에서는 접근할 수 없지만, 클래스 메서드나 동일 클래스의 개별 인스턴스끼리는 접근이 가능
 
