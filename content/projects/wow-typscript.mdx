@@ -89,7 +89,23 @@ sumNumber('a', 'b'); // ab
 - 컴파일: 사람이 이해 할 수 있는 방식으로 작성한 코드를 컴퓨터가 이해할 수 있는 기계어로 바꿔주는 과정
 - TS 컴파일 결과는 JS 파일: JS의 컴파일 타임에 런타임 에러를 사전에 잡아내기 위함
 
+<br />
+
 ## 2.2 TS 타입 시스템
+
+### 타입 Annotation
+
+- 변수나 상수 혹은 함수의 인자와 반환 값에 타입을 명시적으로 선언해서 어떤 타입 값이 저장 될 것인지를 컴파일러에게 직접 알려주는 문법
+
+  ```ts
+  let isDone: boolean = false;
+  let decimal: number = 6;
+  let color: string = 'blue';
+  let list: number[] = [1, 2, 3];
+  let x: [string, number]; // tuple
+  ```
+
+### 구조적 타이핑
 
 # 3장 고급 타입
 
