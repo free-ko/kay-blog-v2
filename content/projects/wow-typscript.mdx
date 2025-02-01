@@ -170,6 +170,42 @@ sumNumber('a', 'b'); // ab
   - `cat` 객체는 `Pet` 인터페이스가 가지고 있는 `name` 속성을 가지고 있어 `pet.name`의 방식으로 `name` 속성에 접근할 수 있음
   - 이와 같은 타이핑 방식이 **구조적 타이핑**
 
+- TS의 서브타이핑, 즉 타입의 상속 역시 구조적 타이핑을 기반으로 하고 있음
+
+  ```ts
+  class Person {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
+  class Developer {
+    name: string;
+    age: number;
+    sleepTime: number;
+
+    constructor(name: string, age: number, sleepTime: number) {
+      this.name = name;
+      this.age = age;
+      this.sleepTime = sleepTime;
+    }
+  }
+
+  function greet(p: Person) {
+    console.log(`Hello, I'm${p.name}`);
+  }
+
+  const developer = new Developer('zig', 20, 7);
+
+  greet(developer); // Hello, I'm zig
+  ```
+
+  - `Develop` 클래스가 `Person` 클래스를 상속받지 않았는데도 `greet(develop)`는 정상적으로 동작함. `Develop`는 `Person`이 갖고 있는 속성을 가지고 있기 때문
+
 <br />
 
 # 3장 고급 타입
