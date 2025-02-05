@@ -273,6 +273,34 @@ sumNumber('a', 'b'); // ab
   console.log(names[2].toUpperCase());
   ```
 
+### 값과 타입
+
+- 값: 프로그램이 처리하기 위해 메모리에 저장하는 모든 데이터
+- TS는 값과 타입이 함께 사용됨
+
+**값과 타입 공간에 동시에 존재하는 심볼**
+
+1. `Class`
+
+```ts
+class Developer {
+  name: string;
+  domain: string;
+
+  constructor(name: string, domain: string) {
+    this.name = name;
+    this.domain = domain;
+  }
+}
+
+const me: Developer = new Developer('kay', 'frontend');
+```
+
+- 변수명 `me` 뒤에 등장하는 `:Developer`에서 `Developer`는 타입에 해당하지만, `new` 키워드 뒤의 `Developer`는 클래스의 생성자 함수인 값으로 동작함
+- TS에서 클래스는 타입 애너테이션으로 사용할 수 있지만, 런타임에서 객체로 변화되어 JS의 값으로 사용되는 특징을 가지고 있음
+
+2. `enum`
+
 <br />
 
 # 3장 고급 타입
