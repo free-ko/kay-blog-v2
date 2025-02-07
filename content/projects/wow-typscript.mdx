@@ -282,24 +282,59 @@ sumNumber('a', 'b'); // ab
 
 1. `Class`
 
-```ts
-class Developer {
-  name: string;
-  domain: string;
+   ```ts
+   class Developer {
+     name: string;
+     domain: string;
 
-  constructor(name: string, domain: string) {
-    this.name = name;
-    this.domain = domain;
-  }
-}
+     constructor(name: string, domain: string) {
+       this.name = name;
+       this.domain = domain;
+     }
+   }
 
-const me: Developer = new Developer('kay', 'frontend');
-```
+   const me: Developer = new Developer('kay', 'frontend');
+   ```
 
 - 변수명 `me` 뒤에 등장하는 `:Developer`에서 `Developer`는 타입에 해당하지만, `new` 키워드 뒤의 `Developer`는 클래스의 생성자 함수인 값으로 동작함
 - TS에서 클래스는 타입 애너테이션으로 사용할 수 있지만, 런타임에서 객체로 변화되어 JS의 값으로 사용되는 특징을 가지고 있음
 
 2. `enum`
+
+- 런타임에 객체로 변환되는 값
+- 런타임에 실제 객체로 존재하며, 함수로 표현할 수도 있음
+
+  ```ts
+  enum Direction {
+    Up, // 0
+    Down, // 1
+    Left, // 2
+    Right, // 3
+  }
+  ```
+
+  ```ts
+  // Enum이 Type으로 사용하는 겨우
+  enum WeekDays {
+    MON = "Mon",
+    TUES = "Tues",
+    WEDNES = "Wednes",
+    THURS = "Thurs',
+    FRI = "Fri"
+  }
+
+  // 'MON' | 'TUES' | 'WEDNES' | 'THURS' | 'FRI'
+  type WeekDaysKey = keyof typeof WeekDays;
+  function printDay(key: WeekDaysKey, message: string) {
+    const day = WeekDays[key];
+
+    if (day <= WeekDays.WEDNES) {
+      console.log(`It's still ${day}day, ${message}`)
+    }
+  }
+
+  printDay("TUES", "wanna go home");
+  ```
 
 <br />
 
