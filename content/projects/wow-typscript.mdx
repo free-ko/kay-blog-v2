@@ -426,6 +426,11 @@ sumNumber('a', 'b'); // ab
 >
 > CommonJS는 트리쉐이킹을 지원하지 않지만, ES6 이후에는 파일 내 특정 모듈만 임포트하면 해당 모듈을 사용하지 않는 파일 코드는 삭제되어 더 작은 크기의 번들링 파일을 생성할 수 있게 되었음
 
+### 타입을 확인 하는 방법
+
+- TS에서 `typeof`, instanceof` 그리고 타입 단언을 사용해 타입을 확인 할 수 있음
+- `typeof`는 연산하기 전에 피연산자의 데이터 타입을 나타내는 문자열을 반환한다. 반환하는 값은 JS의 7가지 기본 데이터 타입(`Boolean, null, undefined, Number, BigInt, String, Symbol)과 Function(함수), 호스트 객체 그리고 object 객체`가 될 수 있다.
+
 <br />
 
 # 3장 고급 타입
