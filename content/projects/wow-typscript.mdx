@@ -430,6 +430,25 @@ sumNumber('a', 'b'); // ab
 
 - TS에서 `typeof`, instanceof` 그리고 타입 단언을 사용해 타입을 확인 할 수 있음
 - `typeof`는 연산하기 전에 피연산자의 데이터 타입을 나타내는 문자열을 반환한다. 반환하는 값은 JS의 7가지 기본 데이터 타입(`Boolean, null, undefined, Number, BigInt, String, Symbol)과 Function(함수), 호스트 객체 그리고 object 객체`가 될 수 있다.
+  ```ts
+  typeof 2022; // "number"
+  typeof 'kay'; // "string"
+  typeof true; // "boolean"
+  typeof {}; // "object"
+  ```
+- TS에는 값 공간과 타입 공간이 별도로 존재함.
+- TS에서 `typeof` 연산자도 값에서 쓰일 때와 타입에서 쓰일 때의 역할이 다름.
+
+  ```ts
+  interface Person {
+    first: string;
+    last: string;
+  }
+
+  const person: Person = { first: 'kay', last: 'ko' };
+
+  function email(options: { person: Person; subject: string; body: string }) {}
+  ```
 
 <br />
 
