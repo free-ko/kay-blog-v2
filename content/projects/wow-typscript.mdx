@@ -460,6 +460,25 @@ sumNumber('a', 'b'); // ab
   type T1 = typeof person; // 타입은 Person
   type T2 = typeof email; // 타입은 (options: { person: Person; subject: string; body: string; }) => void
   ```
+- JS Class 사용시 `typeof` 연산자 주의 사항
+
+  ```ts
+  class Developer {
+    name: string;
+    sleepingTime: number;
+
+    constructor(name: string, sleepingTime: number) {
+      this.name = name;
+      this.sleepingTime = sleepingTime;
+    }
+
+    const d = typeof Developer;  // 값이 'function'
+    type T = typeof Developer;   // 타입이 typeof Developer
+  }
+  ```
+
+  - JS의 Class는 결국 함수이기 때문에 값 공간에서 `typeof Developer`의 값은 `function`이 됨
+  - 타입 공간에서 `typeof Developer`의 반환 값은 조금 특이한데, `type T`에 할당된 `Developer`는 인스턴스의 타입이 아니라, `new` 키워드를 사용할 때 볼 수 있는 생성자 함수이기 때문
 
 <br />
 
