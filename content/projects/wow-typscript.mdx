@@ -450,6 +450,17 @@ sumNumber('a', 'b'); // ab
   function email(options: { person: Person; subject: string; body: string }) {}
   ```
 
+- 값에 사용된 `typeof`는 JS 런타임의 `typeof` 연산자가 됨
+  ```ts
+  const v1 = typeof person; // 'object'
+  const v2 = typeof email; // 'string'
+  ```
+- 반면 타입에 사용된 `typeof`는 값을 읽고 TS 타입을 반환함
+  ```ts
+  type T1 = typeof person; // 타입은 Person
+  type T2 = typeof email; // 타입은 (options: { person: Person; subject: string; body: string; }) => void
+  ```
+
 <br />
 
 # 3장 고급 타입
