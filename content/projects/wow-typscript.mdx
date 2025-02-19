@@ -490,6 +490,31 @@ sumNumber('a', 'b'); // ab
   - JS에서 `instanceof`연산자를 사용하면 프로토타입 체이닝 어딘가에 생성자의 프로토타입 속성이 존재하는지 판단할 수 있음
   - `typeof` 연산자처럼 `instanceof` 연잔사의 필터링으로 타입이 보장된 상태에서 안전하게 값의 타입을 정제하여 사용할 수 있음
 
+    ```ts
+    let error = unknown;
+
+    if (error instanceof Error) {
+      shwAlertModal(error.message);
+    } else {
+      throw Error(error);
+    }
+    ```
+
+- TS에서 타입 단언을 통해 타입을 강제 할 수 있음(`as` 사용)
+- 컴파일 단계에서는 타입 단언이 형 변환을 강제할 수 있지만, 런타임에서는 효력을 발휘하지 못함
+
+  ```ts
+  const loaded_text: unknown; // 어딘가에서 unknown 타입 값을 전달받았다고 가정
+
+  const validateInputText = (text: string) => {
+    if (text.length < 10) return '최소 10글자 이상 입력해야 합니다.';
+
+    return '정상 값 입니다.';
+  };
+
+  validateInputText(loaded_text as string); // as 키워드를 사용해서 string으로 강제 하지 않으면 TS 컴파일러 단계에서 에러 발생
+  ```
+
 <br />
 
 # 3장 고급 타입
