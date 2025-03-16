@@ -1,0 +1,288 @@
+---
+title: 'Next.js의 App Router'
+description: 'Next App Router에대해 자세히 알아보자.'
+date: '2025-03-16 16:05:00'
+published: true
+---
+
+# Next.js의 App Router를 사용하며 느낀 점
+
+Next.js App Router를 사용하면서 Page Router를 보완하며, 더 나은 성능과 개발자 경험을 제공하는 App Router 기능을 알게 되었고 이를 살펴보겠습니다.
+
+<br />
+
+## 1. Page Router와 App Router의 차이
+
+### 디렉토리 구조
+
+처음 App Router를 도입할 때 가장 먼저 눈에 띈 것은 디렉토리 구조의 변화였습니다. Page Router에서는 `/pages` 디렉토리 아래에 라우트를 생성했지만, App Router에서는 `/app` 디렉토리를 사용하며 더 직관적인 파일 기반 라우팅이 가능했습니다.
+
+```ts
+// Page Router
+/pages
+  ├── index.js
+  ├── about.js
+  └── products.js
+
+// App Router
+/app
+  ├── layout.js
+  ├── page.js
+  ├── about
+  │   └── page.js
+  ├── products
+  │   └── page.js
+```
+
+<br />
+
+## 2. App Router의 장점
+
+### 1) 서버 컴포넌트 활용
+
+기존 Page Router에서는 모든 컴포넌트가 기본적으로 클라이언트에서 렌더링되었지만, App Router는 서버 컴포넌트를 기본으로 사용합니다.
+이를 통해 불필요한 클라이언트 사이드 렌더링을 줄이고, 초기 로딩 속도를 향상시킬 수 있었습니다. 또한, 클라이언트 번들 크기를 줄여 네트워크 비용을 절감할 수 있었습니다.
+
+```tsx
+// Page Router (클라이언트에서 데이터 요청)
+export async function getServerSideProps() {
+  const res = await fetch('https://api.example.com/data');
+  const data = await res.json();
+
+  return { props: { data } };
+}
+
+const Page = ({ data }) => <div>{data.title}</div>;
+
+export default Page;
+```
+
+```tsx
+// App Router (서버에서 직접 데이터 요청)
+async function Page() {
+  const res = await fetch('https://api.example.com/data');
+  const data = await res.json();
+
+  return <div>{data.title}</div>;
+}
+
+export default Page;
+```
+
+### 2) 중첩 레이아웃
+
+Page Router에서는 `_app.js`와 `_document.js`를 활용해 전역 레이아웃을 관리해야 했지만, App Router에서는 `layout.js` 파일을 활용해 중첩된 레이아웃을 쉽게 구성할 수 있었습니다. 덕분에 페이지 간 일관성을 유지하면서 불필요한 리렌더링을 방지할 수 있었습니다.
+
+또한, 특정 페이지에서만 다른 레이아웃을 적용할 수도 있어, 더 유연한 UI 구성이 가능했습니다.
+
+```tsx
+export default function Layout({ children }) {
+  return (
+    <div>
+      <header>헤더</header>
+      <main>{children}</main>
+      <footer>푸터</footer>
+    </div>
+  );
+}
+```
+
+### 3) 부분 렌더링
+
+기존 Page Router에서는 페이지 이동 시 전체 페이지가 다시 렌더링되었지만, App Router에서는 **변경된 부분만 렌더링**되기 때문에 UX가 향상되었습니다. 예를 들어, 특정 섹션만 변경되도록 최적화하여 사용자가 빠른 반응성을 경험할 수 있었습니다.
+
+```tsx
+/app
+  ├── layout.js  (레이아웃 유지)
+  ├── page.js    (홈)
+  ├── about
+  │   └── page.js  (about 페이지만 변경)
+```
+
+### 4) 스트리밍 렌더링
+
+#### 기존 Page Router에서의 한계
+
+Page Router에서는 **SSR(Server-Side Rendering)** 을 활용하더라도, 서버가 HTML을 완전히 생성한 후 클라이언트로 응답을 반환해야 했습니다. 따라서, API 호출이 많거나 데이터 처리 시간이 오래 걸리는 경우, 사용자는 화면이 로딩될 때까지 아무것도 볼 수 없었습니다.
+
+#### App Router에서의 개선점
+
+App Router에서는 **React Server Components(RSC)** 와 React의 Streaming Rendering을 활용하여 점진적인 데이터 제공이 가능합니다. 즉, 서버에서 모든 데이터를 기다릴 필요 없이 먼저 준비된 부분부터 클라이언트에 전송하고, 나머지 부분은 이후에 점진적으로 로드됩니다.
+
+이 방식의 핵심적인 장점은 다음과 같습니다.
+
+- **FCP(First Contentful Paint)** 개선: 중요한 UI 요소를 먼저 렌더링하여 사용자 경험을 향상시킴
+
+- **백그라운드 데이터 로딩**: 페이지 일부를 먼저 보여주고, 나머지는 점진적으로 추가됨
+
+- **지연된 데이터 로드 가능**: 특정 섹션의 데이터를 늦게 가져오더라도, 나머지 페이지는 먼저 표시 가능
+
+#### 코드 예제
+
+```tsx
+// app/page.js
+import { Suspense } from 'react';
+import LatestPosts from './LatestPosts';
+
+export default function Home() {
+  return (
+    <div>
+      <h1>홈 페이지</h1>
+      <Suspense fallback={<p>최신 게시물을 불러오는 중...</p>}>
+        <LatestPosts />
+      </Suspense>
+    </div>
+  );
+}
+
+// app/LatestPosts.js
+async function LatestPosts() {
+  const res = await fetch('https://api.example.com/posts');
+  const posts = await res.json();
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+
+export default LatestPosts;
+```
+
+- `Home` 컴포넌트가 렌더링될 때, h1 태그는 즉시 화면에 나타납니다.
+- `LatestPosts` 컴포넌트는 데이터를 비동기적으로 불러와야 하므로, `Suspense`의 `fallback` 속성에 지정된 로딩 UI ("최신 게시물을 불러오는 중...")가 먼저 렌더링됩니다.
+- 서버에서 데이터를 가져오는 동안 `Home` 페이지의 나머지 요소들은 정상적으로 표시됩니다.
+- `LatestPosts`의 데이터가 준비되면, 기존 로딩 UI를 대체하여 게시물 리스트가 화면에 나타납니다.
+
+### 5) 세밀한 캐싱 전략
+
+App Router에서는 `fetch()`를 사용할 때 `next/cache` 옵션을 통해 세밀한 캐싱 제어가 가능했습니다. 이를 활용하면 API 응답을 캐싱하여 성능을 더욱 최적화할 수 있었습니다.
+
+또한, 페이지별로 캐싱을 다르게 설정할 수 있어 사용자의 요청에 맞춘 최적화가 가능했습니다.
+
+```tsx
+async function Page() {
+  const res = await fetch('https://api.example.com/data', {
+    cache: 'force-cache',
+  });
+
+  const data = await res.json();
+  return <div>{data.title}</div>;
+}
+```
+
+#### fetch의 cache 옵션
+
+- **force-cache**: 가능한 경우 기존 캐시를 활용하여 요청을 최소화합니다.
+- **no-store**: 매번 새로운 데이터를 가져오며, 절대 캐싱하지 않습니다.
+
+### 6) SEO 최적화 (동적 메타 데이터 설정 포함)
+
+Page Router에서는 `next/head`를 사용해 메타 정보를 설정해야 했지만, App Router에서는 **메타데이터 API**를 제공하여 SEO 최적화가 훨씬 간편해졌습니다.
+
+특히, 검색 엔진이 페이지의 메타 정보를 빠르게 파악할 수 있도록 개선되었으며, SSR과 조합하면 검색 최적화가 훨씬 쉬워졌습니다.
+
+정적인 메타데이터 설정뿐만 아니라, 동적으로 페이지별 메타데이터를 설정할 수도 있습니다.
+
+```tsx
+// 정적인 메타데이터 설정
+export const metadata = {
+  title: 'My Page',
+  description: '이 페이지는 Next.js App Router를 사용합니다.',
+};
+```
+
+```tsx
+// 동적인 메타데이터 설정 (예: 블로그 포스트 페이지)
+export async function generateMetadata({ params }) {
+  const post = await fetch(`https://api.example.com/posts/${params.id}`).then(
+    (res) => res.json()
+  );
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: `https://example.com/posts/${params.id}`,
+      type: 'article',
+    },
+  };
+}
+```
+
+### 7) 병렬 컴포넌트 렌더링 (Parallel Routes)
+
+App Router에서는 병렬 컴포넌트 렌더링을 지원하여, 여러 개의 경로(route)를 동시에 로드할 수 있습니다. 이는 특히 대시보드와 같은 레이아웃에서 각각의 섹션이 독립적으로 렌더링될 때 유용합니다.
+
+#### 병렬 컴포넌트 렌더링 예제
+
+```tsx
+// app/layout.js
+export default function Layout({ children, notifications, sidebar }) {
+  return (
+    <div>
+      <aside>{sidebar}</aside>
+      <main>{children}</main>
+      <section>{notifications}</section>
+    </div>
+  );
+}
+
+// app/@sidebar/page.js
+export default function Sidebar() {
+  return <nav>사이드바</nav>;
+}
+
+// app/@notifications/page.js
+export default function Notifications() {
+  return <div>알림 목록</div>;
+}
+```
+
+**병렬 컴포넌트 렌더링의 장점**
+
+- **독립적 로딩**: 각 컴포넌트가 독립적으로 로드되므로 한 섹션의 데이터 로딩이 느려도 전체 페이지가 지연되지 않음
+- **더 나은 사용자 경험**: 주요 콘텐츠가 먼저 로드되고, 부가적인 UI 요소(예: 알림, 사이드바 등)는 비동기적으로 추가 가능
+
+### 8) 인터셉터 라우트 (Intercepting Routes)
+
+기존 Page Router에서는 특정 페이지 내에서 다른 페이지를 임시로 보여주려면 별도의 상태 관리가 필요했지만, App Router에서는 인터셉터 라우트 기능을 사용하여 쉽게 해결할 수 있습니다.
+
+#### 인터셉터 라우트 예제
+
+```tsx
+// app/products/page.js
+export default function ProductsPage() {
+  return (
+    <div>
+      <h1>상품 목록</h1>
+      {/* 특정 상품을 클릭하면 모달처럼 띄울 수 있음 */}
+    </div>
+  );
+}
+
+// app/(..)/products/[id]/page.js
+export default function ProductDetail({ params }) {
+  return (
+    <div>
+      <h1>상품 상세 정보 - {params.id}</h1>
+    </div>
+  );
+}
+```
+
+**인터셉터 라우트의 장점**
+
+- **모달 방식으로 다른 페이지를 띄울 수 있음**: 예를 들어, 상품 목록에서 특정 상품을 클릭하면 모달처럼 보여줄 수 있음
+- **전체 페이지 리로드 없이 동작**: 기존 Page Router에서는 이와 같은 동작을 위해 상태 관리나 별도의 라우팅 처리가 필요했지만, App Router에서는 간단하게 해결 가능
+
+<br />
+
+## 3. 결론
+
+App Router를 도입한 후 성능 최적화와 개발자 경험이 크게 개선되었음을 체감할 수 있었습니다. **특히, 서버 컴포넌트, 중첩 레이아웃, 부분 렌더링, 스트리밍, 병렬 컴포넌트 렌더링, 인터셉터 라우트, SEO 최적화 등의 기능이 기존 Page Router보다 훨씬 유리하게 작용하며, 세밀한 캐싱 전략**을 통해 성능 최적화가 가능해졌습니다.
+
+아직 모든 프로젝트에 적용하기에는 생태계가 완전히 성숙하지 않았고, 기존 프로젝트를 마이그레이션할 때 고려해야 할 점이 많지만, 신규 프로젝트에서는 App Router를 적극 활용하는 것이 좋다고 확신하게 되었습니다.
