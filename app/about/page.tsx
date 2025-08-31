@@ -130,11 +130,11 @@ export default function About() {
                   대규모 트래픽 처리를 위한 공연 좌석제 시스템 구축
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  Seats.io 라이브러리를 기반으로 모든 유형의 공연 좌석제를
-                  지원하는 시스템을 개발했습니다. WebSocket을 활용한 대기룸
-                  기능을 구현하여 동시 접속자 10만 명까지 안정적으로 처리할 수
-                  있는 환경을 구축했습니다. 이를 통해 회사의 새로운 사업 영역
-                  확장에 기여했습니다.
+                  Seats.io 라이브러리를 기반으로 공연 좌석제를 지원하는 서비스를
+                  개발했습니다. WebSocket을 활용한 대기룸 기능을 구현하여 동시
+                  접속자 10만 명까지 안정적으로 처리할 수 있는 UI 환경을
+                  구축했습니다. 이를 통해 회사의 새로운 사업 영역 확장에
+                  기여했습니다.
                 </p>
               </div>
               <div>
@@ -214,33 +214,65 @@ export default function About() {
             </div>
 
             <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-              넥스트유니콘은 대한민국의 10,600여 개 스타트업과 1,060여 개
-              투자기관을 연결하는 스타트업 생태계 플랫폼 서비스입니다.
-              스타트업의 투자유치, 채용, 정보 비대칭 등 성장 과정에서 발생하는
-              핵심 문제들을 기술로 해결하여 창업 생태계 혁신을 추진하는 회사에서
-              개발 업무를 담당했습니다.
+              넥스트유니콘은 국내 1만여 개 스타트업과 1천여 개 투자기관을
+              연결하는 스타트업 생태계 플랫폼입니다.
             </p>
 
             <div className="space-y-3 sm:space-y-4">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  AI 기반 사업계획서 추천 시스템 개발
+                  사업계획서 추천 솔루션 개발
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  OpenAI의 GPT 모델을 활용하여 사용자 맞춤형 사업계획서 샘플을
-                  제공하는 서비스를 개발했습니다. 사용자의 업종과 사업 단계에
-                  따라 적합한 템플릿을 추천하여 창업자들의 사업계획서 작성
-                  부담을 크게 줄였습니다.
+                  OpenAI의 터보와 다빈치 모델을 활용해 창업자들의 사업계획서
+                  작성 부담을 크게 줄이는 맞춤형 추천 시스템을 개발했습니다.
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  플랫폼 아키텍처 개선 및 SEO 최적화
+                  플랫폼 성장을 위한 아키텍처 최적화
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  Next.js 프로젝트의 아키텍처를 리팩토링하여 코드 응집도를
-                  높이고 유지보수성을 개선했습니다. 구조화된 데이터를 적용하여
-                  SEO를 최적화한 결과, 플랫폼 유입 MAU가 5% 증가했습니다.
+                  <a
+                    href="https://free-ko.github.io/new-architecture/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors duration-200 underline"
+                  >
+                    Next.js 마이그레이션
+                  </a>
+                  을 통해 코드 응집도를 강화하고 개발 리소스를 절약했습니다.{" "}
+                  <a
+                    href="https://kay-blog-v2.vercel.app/docs/apply-articlejsonId"
+                    className="hover:text-white transition-colors duration-200 underline"
+                  >
+                    구조화된 데이터 적용
+                  </a>
+                  과 SEO 최적화 작업으로{" "}
+                  <a
+                    href="https://kay-blog-v2.vercel.app/docs/3rd-party-management"
+                    className="hover:text-white transition-colors duration-200 underline"
+                  >
+                    플랫폼 유입
+                  </a>{" "}
+                  MAU를 5% 증가시켜 비즈니스 성장에 직접적으로 기여했습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  사용자 경험 개선
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  React-Search-Autocomplete 라이브러리 커스터마이징과{" "}
+                  <a
+                    href="https://kay-blog-v2.vercel.app/docs/forms"
+                    className="hover:text-white transition-colors duration-200 underline"
+                  >
+                    React-Hook-Form
+                  </a>
+                  , Yup을 활용한 검증 시스템 구축으로 사용자 인터페이스를
+                  개선했습니다. Zustand 도입을 통한 상태 관리 최적화로 불필요한
+                  리렌더링을 제거하여 전반적인 사용자 경험을 향상시켰습니다.
                 </p>
               </div>
             </div>
@@ -274,23 +306,26 @@ export default function About() {
             <div className="space-y-3 sm:space-y-4">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  레디베이비 앱 성능 최적화
+                  사용자 중심의 서비스 혁신으로 시장 점유율 확대
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  TypeScript 도입을 통해 코드 품질과 유지보수성을
-                  향상시켰습니다. UI 렌더링 최적화를 통해 FCP를 10% 개선했고,
-                  코드 모듈화와 이미지 최적화를 통해 앱 용량을 50% 이상
-                  감소(91MB → 38MB)시켰습니다.
+                  임산부와 육아맘을 위한 맞춤형 상품 및 콘텐츠 검색 페이지를
+                  개발하여 사용자 체류 시간을 크게 늘렸습니다. TypeScript 도입과
+                  체계적인 코드 모듈화를 통해 개발 효율성을 높이고, 이미지
+                  최적화 및 불필요한 로직 제거로 앱 용량을 91MB에서 38MB로 50%
+                  이상 감소시켜 사용자 경험을 개선했습니다.
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  홈팁스 검색 서비스 개발
+                  지원금 서비스로 유저 가입률 44.5% 증가 달성
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  사용자 맞춤형 지원금 검색 기능을 개발하여 유저 가입률을 44.5%
-                  향상시켰습니다. Debounce 기법을 적용하여 불필요한 API 호출을
-                  제거하고 사용자 경험을 개선했습니다.
+                  사용자 맞춤형 지원금 검색 및 추천 서비스와 댓글·찜·공유 기능을
+                  통한 사용자 친화적 기능 요소를 제공습니다. Debounce 기법
+                  적용으로 API 호출을 최적화하고 UI 리팩토링을 통해 사용자
+                  이탈률을 감소시켜, 최종적으로 유저 가입률을 44.5% 상승시키는
+                  비즈니스 성과를 달성했습니다.
                 </p>
               </div>
             </div>
