@@ -57,8 +57,15 @@ export default function About() {
               마카롱팩토리는 차량 관리의 새 기준을 세우는 회사입니다. 불안하고
               막막했던 차량 관리를 더 쉽고 편하게 만들어 정비 시장을 바꿔나가고
               있습니다. 현재 570만 대의 누적 차량 등록과 월 평균 80만 명이
-              사용하는 국내 차량 관리 앱 1위 서비스 '마이클'을 운영하고
-              있습니다.
+              사용하는 국내 차량 관리 앱 1위 서비스
+              <a
+                target="_blank"
+                href="https://mycle.co.kr/index.html"
+                rel="noopener noreferrer"
+              >
+                '마이클'
+              </a>
+              을 운영하고 있습니다.
             </p>
 
             <div className="space-y-3 sm:space-y-4">
