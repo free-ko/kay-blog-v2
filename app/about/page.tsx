@@ -272,11 +272,20 @@ export default function About() {
                   Next.js 아키텍처 리팩토링을 통한 협업 효율성 개선
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  비일관적인 프로젝트 구조로 인한 협업 장애를 해결하기 위해
-                  아키텍처를 재설계했습니다. 계층별 책임 분리(pages, templates,
-                  features, shared), 단방향 참조 규칙 적용, ESLint를 통한 의존성
-                  관리로 코드 응집성을 크게 향상시켰습니다. 결과적으로 팀원들의
-                  코드 이해 시간이 단축되고 유지보수성이 개선되었습니다.
+                  비 일관적인 프로젝트 구조로 인한 협업시 커뮤니케이션 리소스를
+                  줄이기 위해{" "}
+                  <Link
+                    target="_blank"
+                    href="https://free-ko.github.io/new-architecture/"
+                    className="text-zinc-300 underline"
+                  >
+                    아키텍처
+                  </Link>{" "}
+                  재 설계를 제안했습니다. 계층별 책임 분리(pages, templates,
+                  features, shared), ESLint를 통한 단방향 의존성 참조 규칙
+                  적용으로 코드 응집성을 크게 향상시켰습니다. 결과적으로
+                  팀원들의 코드 이해 시간이 단축되고 커뮤니케이션 리소스를
+                  줄이며 유지보수성이 개선되었습니다.
                 </p>
               </div>
               <div>
