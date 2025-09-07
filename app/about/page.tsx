@@ -1,4 +1,6 @@
 "use client";
+
+import Link from "next/link";
 import { Navigation } from "../components/nav";
 
 export default function About() {
@@ -20,10 +22,9 @@ export default function About() {
               노력합니다.
             </p>
             <p>
-              동료들과 함께 성장하는 것을 중요하게 생각하며, 꾸준한 학습과 지식
-              공유를 통해 팀 전체의 역량 향상에 기여하고 있습니다. <br /> 매일
-              아침 20분의 학습과 프론트엔드 위클리 운영을 통해 개인적인 성장뿐만
-              아니라 팀의 발전에도 힘쓰고 있습니다.
+              또한 동료들과 함께 성장하는 것을 중요하게 생각하며, 매일 출근 전
+              학습과 데일리 & 위클리를 통해 개인적인 성장뿐만 아니라 팀의
+              발전에도 힘쓰고 있습니다.
             </p>
           </div>
         </header>
@@ -54,44 +55,80 @@ export default function About() {
             </div>
 
             <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-              마카롱팩토리는 차량 관리의 새 기준을 세우는 회사입니다. 불안하고
-              막막했던 차량 관리를 더 쉽고 편하게 만들어 정비 시장을 바꿔나가고
-              있습니다. 현재 570만 대의 누적 차량 등록과 월 평균 80만 명이
-              사용하는 국내 차량 관리 앱 1위 서비스
-              <a
+              마카롱팩토리는 차량 관리를 더 쉽고 편하게 만들어 정비 시장을
+              바꿔나가고 있습니다. 현재 570만 대의 누적 차량 등록과 월 평균 80만
+              명이 사용하는 국내 차량 관리 앱 1위 서비스{" "}
+              <Link
                 target="_blank"
                 href="https://mycle.co.kr/index.html"
-                rel="noopener noreferrer"
+                className="text-zinc-300 underline"
               >
-                '마이클'
-              </a>
+                마이클
+              </Link>
               을 운영하고 있습니다.
             </p>
 
-            <div className="space-y-3 sm:space-y-4">
+            <br />
+
+            <div className="space-y-4 sm:space-y-6">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  <a
-                    href="https://toss.im/apps-in-toss"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-zinc-300 transition-colors duration-200"
-                  >
-                    토스 미니앱 개발
-                  </a>
+                  웹팀 데일리 & 위클리 프로세스 도입
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  팀 내 업무 상황 공유와 다양한 논의를 진행하기 위해 매일 30분씩
+                  데일리 스크럼을 제안하여 팀 내 문화로 정착시켰습니다. 이
+                  과정에서 서로 학습한 내용과 실수한 내용을 공유해 어떻게 하면
+                  학습한 내용을 실무에 반영시킬지, 더 나아가 실수한 내용을
+                  방지하기 위한 팀 내 효율적인 시스템을 구축할 수 있을지
+                  논의하는 자리를 만들었습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  토스 미니앱 개발
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                   전국 2,000곳 이상의 정비소와 연결된 마이클 서비스를 토스의
                   3,000만 누적 가입자에게 제공하기 위해 앱인토스 미니앱을 웹뷰
                   기반으로 개발했습니다. 토스 사용자들이 별도 앱 설치 없이도
                   차량 정비 예약과 관리 할 수 있는 경험을 구현하여 서비스
-                  접근성을 크게 향상시켰습니다. 토스의 TDS(Toss Design System)와
-                  UX 가이드라인을 준수하면서 토스 생태계 내에서 자연스러운
-                  사용자 경험을 제공하도록 개발 했습니다.
+                  접근성을 크게 향상시켰습니다. 개발 과정에서 디자이너, PM과
+                  협업하여 API 호출 실패, 네트워크 연결 끊김 등 다양한 에러
+                  상황에 대한 사용자 친화적인 UI/UX 플로우를 제안하고
+                  구현했습니다. 토스의 TDS(Toss Design System)와 UX 가이드라인을
+                  준수하면서 토스 생태계 내에서 자연스러운 사용자 경험을
+                  제공하도록 개발했습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  Sentry를 통한 에러 로깅 시스템 구축
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  웹팀 내부 에러 로깅 시스템 부재로 배포 후 문제 파악과 개선
+                  우선순위 설정이 어려웠던 상황에서, Sentry 도입을 제안하여 에러
+                  로깅 시스템을 구축했습니다. Slack 연동을 통해 실시간 에러
+                  알람을 받을 수 있도록 설정하여, 에러 발생 현황을 즉시 파악하고
+                  빈도 기반으로 개선 우선순위를 정할 수 있게 되었습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  디자인 시스템 개발 및 도입
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  팀의 생산성을 높이기 위해 디자인 시스템의 필요성을 제안하고
+                  프로젝트를 진행했습니다. 비즈니스를 방해하지 않으면서
+                  성공적으로 디자인 시스템을 적용하기 위해 가장 핵심적인
+                  토큰부터 도입하고, 이후 복잡한 컴포넌트를 점진적으로
+                  도입해나가는 전략을 사용했습니다.
                 </p>
               </div>
             </div>
           </div>
+
+          <br />
 
           {/* 모던라이언 */}
           <div className="mb-8 sm:mb-12">
@@ -119,7 +156,60 @@ export default function About() {
               구축에 집중했습니다.
             </p>
 
-            <div className="space-y-3 sm:space-y-4">
+            <br />
+
+            <div className="space-y-4 sm:space-y-6">
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  대규모 트래픽 처리를 위한 공연 좌석제 시스템 구축
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  Seats.io 라이브러리를 기반으로 공연 좌석제를 지원하는 시스템을
+                  개발했습니다. WebSocket을 활용한{" "}
+                  <Link
+                    target="_blank"
+                    href="/docs/waiting-room"
+                    className="text-zinc-300 underline"
+                  >
+                    대기룸
+                  </Link>{" "}
+                  기능을 구현하여 동시 접속자 10만 명까지 안정적으로 처리할 수
+                  있는 UI 환경을 구축했습니다. 이를 통해 회사의 새로운 사업 영역
+                  확장에 기여했습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  글로벌 서비스를 위한 다국어 시스템 구축
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  글로벌 유저 대응을 위한{" "}
+                  <Link
+                    target="_blank"
+                    href="/docs/global-language"
+                    className="text-zinc-300 underline"
+                  >
+                    다국어
+                  </Link>{" "}
+                  지원 과정에서 개발자 개입 없는 번역 관리가 필요했고,
+                  next-i18next(SEO 최적화)와 Google Sheets(비개발자 접근성)를
+                  연동한 자동화 시스템을 구축했습니다. Google Sheets의 번역
+                  데이터를 JSON으로 변환하는 스크립트를 개발하고 빌드 프로세스에
+                  통합하여, 배포 시 항상 최신 번역이 반영되도록 자동화했습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  Next.js 기반 어드민 시스템 마이그레이션
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  Refine 기반 레거시 어드민의 커스터마이징 제약과 빌드 속도
+                  문제로 개발 생산성이 저하되는 상황에서, Next.js로
+                  마이그레이션을 진행했습니다. 컴포넌트 재사용성을 높이고 Docker
+                  멀티 스테이지 빌드 도입으로 배포 이미지를 94% 경량화(1GB →
+                  60MB)하여, 빌드 시간을 단축시켰습니다.
+                </p>
+              </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
                   결제 시스템 아키텍처 설계 및 개발
@@ -132,74 +222,10 @@ export default function About() {
                   결제 로직의 안정성을 보장했습니다.
                 </p>
               </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  대규모 트래픽 처리를 위한 공연 좌석제 시스템 구축
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  Seats.io 라이브러리를 기반으로 공연 좌석제를 지원하는 서비스를
-                  개발했습니다. WebSocket을 활용한 대기룸 기능을 구현하여 동시
-                  접속자 10만 명까지 안정적으로 처리할 수 있는 UI 환경을
-                  구축했습니다. 이를 통해 회사의 새로운 사업 영역 확장에
-                  기여했습니다.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  NFT 마켓플레이스 성능 최적화
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  복잡한 NFT 거래 로직을 커스텀 훅으로 추상화하여 개발 생산성을
-                  높였습니다. 불필요한 API 호출을 제거하고 상태 관리 로직을
-                  최적화하여 사용자 경험을 개선했습니다.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  Next.js 기반 어드민 시스템 마이그레이션
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  기존 Refine 기반 대시보드를 Next.js로 마이그레이션하여
-                  팀원들의 개발 생산성을 향상시켰습니다. React-Hook-Form과 Yup을
-                  활용한 일관성 있는 폼 검증 시스템을 구축했고, Docker 멀티
-                  스테이지 빌드를 통해 배포 이미지 크기를 94% 감소(1GB →
-                  60MB)시켰습니다.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  글로벌 서비스를 위한 다국어 시스템 구축
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  next-i18next를 활용한 다국어 환경을 구축하고, Google Sheets의
-                  번역 데이터를 JSON으로 자동 변환하는 스크립트를 개발했습니다.
-                  배포 프로세스와 연동하여 번역 데이터가 자동으로 동기화되도록
-                  구현했습니다.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  디자인 시스템 패키지 개발 및 운영
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  디자이너와의 긴밀한 협업을 통해 재사용 가능한 디자인 시스템
-                  패키지를 구축했습니다. Storybook을 활용한 컴포넌트 문서화로 팀
-                  내 협업 효율성을 높이고, 디자인 QA 시간을 단축시켰습니다.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  운영 모니터링 시스템 구축
-                </h4>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  Sentry와 Slack을 연동한 실시간 에러 알림 시스템을 구축하여
-                  장애 대응 시간을 단축했습니다. 주요 이슈를 팀원들과 즉시
-                  공유할 수 있는 환경을 만들어 서비스 안정성을 크게
-                  향상시켰습니다.
-                </p>
-              </div>
             </div>
           </div>
+
+          <br />
 
           {/* 넥스트유니콘 */}
           <div className="mb-8 sm:mb-12">
@@ -221,69 +247,79 @@ export default function About() {
             </div>
 
             <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-              넥스트유니콘은 국내 1만여 개 스타트업과 1천여 개 투자기관을
-              연결하는 스타트업 생태계 플랫폼입니다.
+              넥스트유니콘은 대한민국의 10,600여 개 스타트업과 1,060여 개
+              투자기관을 연결하는 스타트업 생태계 플랫폼 서비스입니다.
+              스타트업의 투자유치, 채용, 정보 비대칭 등 성장 과정에서 발생하는
+              핵심 문제들을 기술로 해결하여 창업 생태계 혁신을 추진하는 회사에서
+              개발 업무를 담당했습니다.
             </p>
 
-            <div className="space-y-3 sm:space-y-4">
+            <br />
+
+            <div className="space-y-4 sm:space-y-6">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  사업계획서 추천 솔루션 개발
+                  AI 기반 사업계획서 추천 시스템 개발
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  OpenAI의 터보와 다빈치 모델을 활용해 창업자들의 사업계획서
-                  작성 부담을 크게 줄이는 맞춤형 추천 시스템을 개발했습니다.
+                  창업자들의 사업 계획서 작성 부담을 줄이기 위해, OpenAI의 초기
+                  터보와 다빈치 모델을 활용하여 사용자 맞춤형 사업계획서 샘플을
+                  제공하는 서비스를 개발했습니다.
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  플랫폼 성장을 위한 아키텍처 최적화
+                  Next.js 아키텍처 리팩토링을 통한 협업 효율성 개선
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  <a
-                    href="https://free-ko.github.io/new-architecture/"
+                  비일관적인 프로젝트 구조로 인한 협업 장애를 해결하기 위해
+                  아키텍처를 재설계했습니다. 계층별 책임 분리(pages, templates,
+                  features, shared), 단방향 참조 규칙 적용, ESLint를 통한 의존성
+                  관리로 코드 응집성을 크게 향상시켰습니다. 결과적으로 팀원들의
+                  코드 이해 시간이 단축되고 유지보수성이 개선되었습니다.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  콘텐츠 플랫폼 검색 노출 및 공유 시스템 개선
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  콘텐츠 플랫폼의 검색 엔진 노출 부족 문제를 해결하기 위해{" "}
+                  <Link
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors duration-200 underline"
+                    href="/docs/apply-articlejsonId"
+                    className="text-zinc-300 underline"
                   >
-                    Next.js 마이그레이션
-                  </a>
-                  을 통해 코드 응집도를 강화하고 개발 리소스를 절약했습니다.{" "}
-                  <a
-                    href="https://kay-blog-v2.vercel.app/docs/apply-articlejsonId"
-                    className="hover:text-white transition-colors duration-200 underline"
+                    구조화된 데이터
+                  </Link>{" "}
+                  를 적용했습니다. 또한 반복적으로 구현되던 SNS{" "}
+                  <Link
+                    target="_blank"
+                    href="/docs/3rd-party-management"
+                    className="text-zinc-300 underline"
                   >
-                    구조화된 데이터 적용
-                  </a>
-                  과 SEO 최적화 작업으로{" "}
-                  <a
-                    href="https://kay-blog-v2.vercel.app/docs/3rd-party-management"
-                    className="hover:text-white transition-colors duration-200 underline"
-                  >
-                    플랫폼 유입
-                  </a>{" "}
-                  MAU를 5% 증가시켜 비즈니스 성장에 직접적으로 기여했습니다.
+                    공유 기능
+                  </Link>{" "}
+                  을 재사용 가능한 모듈로 개발하여 유지보수 효율성을 높였습니다.
+                  그 결과 플랫폼 MAU 5% 증가를 달성했습니다.
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  사용자 경험 개선
+                  외부 라이브러리 커스터마이징을 통한 성능 개선
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  React-Search-Autocomplete 라이브러리 커스터마이징과{" "}
-                  <a
-                    href="https://kay-blog-v2.vercel.app/docs/forms"
-                    className="hover:text-white transition-colors duration-200 underline"
-                  >
-                    React-Hook-Form
-                  </a>
-                  , Yup을 활용한 검증 시스템 구축으로 사용자 인터페이스를
-                  개선했습니다. Zustand 도입을 통한 상태 관리 최적화로 불필요한
-                  리렌더링을 제거하여 전반적인 사용자 경험을 향상시켰습니다.
+                  서비스에서 사용되는 React-Search-Autocomplete의 성능 이슈를
+                  근본적으로 해결하기 위해 라이브러리를 분석하고 자체 컴포넌트로
+                  재구축했습니다. 중복 상태 관리 로직을 제거하여 리렌더링을
+                  최소화하고, 개발자 친화적인 API를 제공하여 팀 전체의 개발
+                  효율성을 향상시켰습니다.
                 </p>
               </div>
             </div>
           </div>
+
+          <br />
 
           {/* 에픽모바일 */}
           <div className="mb-8 sm:mb-12">
@@ -313,26 +349,42 @@ export default function About() {
             <div className="space-y-3 sm:space-y-4">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  사용자 중심의 서비스 혁신으로 시장 점유율 확대
+                  <Link
+                    target="_blank"
+                    href="https://play.google.com/store/apps/details?id=net.epicmobile.readybaby&pli=1"
+                    className="text-zinc-300 underline"
+                  >
+                    레디베이비
+                  </Link>{" "}
+                  앱 성능 최적화
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  임산부와 육아맘을 위한 맞춤형 상품 및 콘텐츠 검색 페이지를
-                  개발하여 사용자 체류 시간을 크게 늘렸습니다. TypeScript 도입과
-                  체계적인 코드 모듈화를 통해 개발 효율성을 높이고, 이미지
-                  최적화 및 불필요한 로직 제거로 앱 용량을 91MB에서 38MB로 50%
-                  이상 감소시켜 사용자 경험을 개선했습니다.
+                  JavaScript 프로젝트의 잦은 런타임 에러를 방지하기 위해
+                  TypeScript를 도입하여 코드 품질과 유지보수성을 향상시켰습니다.
+                  또한 느린 앱 다운로드로 인한 설치 포기 문제를 해결하기 위해
+                  중복 코드 제거 및 이미지 최적화를 진행하여 앱 용량을 58%
+                  감소(91MB → 38MB)시켰고, 컴포넌트 리팩토링을 통해 초기 로딩
+                  속도를 개선하여 사용자 이탈률을 크게 감소시켰습니다.
                 </p>
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  지원금 서비스로 유저 가입률 44.5% 증가 달성
+                  <Link
+                    target="_blank"
+                    href="https://play.google.com/store/apps/details?id=net.epicmobile.hometips"
+                    className="text-zinc-300 underline"
+                  >
+                    홈팁스
+                  </Link>{" "}
+                  지원금 검색 서비스 개발
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  사용자 맞춤형 지원금 검색 및 추천 서비스와 댓글·찜·공유 기능을
-                  통한 사용자 친화적 기능 요소를 제공습니다. Debounce 기법
-                  적용으로 API 호출을 최적화하고 UI 리팩토링을 통해 사용자
-                  이탈률을 감소시켜, 최종적으로 유저 가입률을 44.5% 상승시키는
-                  비즈니스 성과를 달성했습니다.
+                  복잡하고 분산된 정부 지원금 정보로 인해 사용자들이 혜택을
+                  놓치는 문제를 해결하기 위해 맞춤형 지원금 검색 기능을
+                  개발했습니다. 또한 검색 입력 시마다 발생하는 과도한 API 호출
+                  문제를 Debounce 기법으로 해결하여 서버 부하를 80% 감소시켰고,
+                  댓글/찜/공유 등 소셜 기능을 추가하여 사용자 참여도를 높인 결과
+                  유저 가입률 44.5% 향상을 달성했습니다.
                 </p>
               </div>
             </div>
@@ -348,108 +400,59 @@ export default function About() {
           <div className="space-y-6 sm:space-y-8">
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
-                기술 학습 및 지식 공유
+                스터디
               </h3>
+              <ul className="text-gray-300 leading-relaxed space-y-1 text-sm sm:text-base list-disc list-inside">
+                <li>
+                  <Link
+                    target="_blank"
+                    href="https://www.codesoom.com/"
+                    className="text-zinc-300 underline"
+                  >
+                    <strong>코드숨 React 7기</strong>
+                  </Link>
+                  : TDD와 코드 리뷰를 경험하는 실무 중심 프로그램
+                </li>
+                <li>
+                  <Link
+                    target="_blank"
+                    href="https://github.com/pagers-org/Effective-TypeScript"
+                    className="text-zinc-300 underline"
+                  >
+                    <strong>Effective TypeScript 스터디</strong>
+                  </Link>
+                  : 발표와 과제 중심의 타입스크립트 심화 학습
+                </li>
+                <li>
+                  <Link
+                    target="_blank"
+                    href="https://github.com/pagers-org/FunctionalProgramming"
+                    className="text-zinc-300 underline"
+                  >
+                    <strong>함수형 프로그래밍 스터디</strong>
+                  </Link>
+                  : 쏙쏙들어오는 함수형 코딩 책 기반 실습
+                </li>
+                <li>
+                  <Link
+                    target="_blank"
+                    href="https://zzsza.notion.site/ac5b18a482fb4df497d4e8257ad4d516"
+                    className="text-zinc-300 underline"
+                  >
+                    <strong>글또</strong>
+                  </Link>
+                  : 개발자들이 모여 2주마다 글을 작성하고 피드백을 나누는 스터디
+                </li>
+              </ul>
+            </div>
 
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                    1. 프론트엔드 위클리 운영
-                  </h4>
-                  <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                    팀 내에서 프론트엔드 위클리를 기획하고 운영하여 실수와 실패
-                    경험을 솔직하게 공유하는 문화를 만들었습니다. 이를 통해
-                    팀원들이 서로 배우며 성장할 수 있는 환경을 조성했습니다.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                    2. 꾸준한 학습과 기록
-                  </h4>
-                  <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                    매일 출근 전 20분 동안 개발 관련 글과 영상을 학습하고, 배운
-                    내용을 블로그에 정리하여 커뮤니티와 공유하고 있습니다.
-                    이러한 꾸준한 학습이 개인의 성장과 팀의 발전으로 이어지고
-                    있다고 믿습니다.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                    3. 스터디 및 커뮤니티 활동
-                  </h4>
-                  <div className="text-gray-300 leading-relaxed space-y-1 text-sm sm:text-base">
-                    <p>
-                      <strong>
-                        <a
-                          href="https://www.notion.so/zzsza/ac5b18a482fb4df497d4e8257ad4d516"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-white transition-colors duration-200"
-                        >
-                          글또
-                        </a>
-                        :
-                      </strong>{" "}
-                      개발자들이 모여 2주마다 글을 작성하고 피드백을 나누는
-                      스터디 참여
-                    </p>
-                    <p>
-                      <strong>
-                        <a
-                          href="https://github.com/FECrash/FunctionalProgramming"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-white transition-colors duration-200"
-                        >
-                          함수형 프로그래밍 스터디
-                        </a>
-                        :
-                      </strong>{" "}
-                      쏙쏙들어오는 함수형 코딩 책을 기반으로 한 실습 중심 스터디
-                    </p>
-                    <p>
-                      <strong>
-                        <a
-                          href="https://github.com/FECrash/Effective-TypeScript"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-white transition-colors duration-200"
-                        >
-                          Effective TypeScript 스터디
-                        </a>
-                        :
-                      </strong>{" "}
-                      발표와 과제 중심의 타입스크립트 심화 학습
-                    </p>
-                    <p>
-                      <strong>
-                        <a
-                          href="https://www.codesoom.com/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-white transition-colors duration-200"
-                        >
-                          코드숨 React 7기
-                        </a>
-                        :
-                      </strong>{" "}
-                      TDD와 코드 리뷰를 경험하는 실무 중심 프로그램
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                    4. 기술 자격증 취득
-                  </h4>
-                  <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                    2021년 정보처리기사 자격증을 취득하여 개발자로서 필요한 기본
-                    CS 개념을 체계적으로 학습했습니다.
-                  </p>
-                </div>
-              </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
+                자격증
+              </h3>
+              <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                • 정보처리기사 (2021.11)
+              </p>
             </div>
           </div>
         </section>
