@@ -52,54 +52,6 @@ jobs:
 
           await github.rest.pulls.createReview(reviewComment);
 
-          // 특정 파일에 대한 인라인 코멘트 (예시)
-          if (changedFiles.some(f => f.includes('particles.tsx'))) {
-            const { data: prFiles } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number
-            });
-
-            const particlesFile = prFiles.find(f => f.filename.includes('particles.tsx'));
-
-            if (particlesFile && particlesFile.patch) {
-              // 파일의 변경사항에서 특정 패턴 찾기
-              const lines = particlesFile.patch.split('\n');
-              let position = 0;
-
-              for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                position++;
-
-                // type Circle 정의를 찾았을 때 코멘트 남기기
-                if (line.includes('+type Circle')) {
-                  await github.rest.pulls.createReviewComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: pr.number,
-                    body: '👍 타입 정의를 컴포넌트 외부로 이동한 것은 좋은 선택입니다. 재사용성과 가독성이 향상되었네요!',
-                    path: particlesFile.filename,
-                    position: position,
-                    commit_id: pr.head.sha
-                  });
-                }
-
-                // useCallback 사용 패턴 발견 시
-                if (line.includes('+') && line.includes('useCallback')) {
-                  await github.rest.pulls.createReviewComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: pr.number,
-                    body: '✨ useCallback을 사용한 성능 최적화가 적용되었습니다. 불필요한 리렌더링을 방지할 수 있습니다.',
-                    path: particlesFile.filename,
-                    position: position,
-                    commit_id: pr.head.sha
-                  });
-                }
-              }
-            }
-          }
-
           // TypeScript 파일 변경 시 타입 체크 관련 코멘트
           const tsFiles = changedFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
           if (tsFiles.length > 0) {
