@@ -2,68 +2,359 @@ name: PR Auto Review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, ready_for_review, reopened]
+    # 특정 경로만 검사하려면 아래 주석 해제
+    # paths:
+    #   - "src/**"
+    #   - "app/**"
+    #   - "components/**"
 
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 jobs:
-  auto-review:
+  # Claude API를 사용한 AI 기반 코드 리뷰
+  claude-review:
+    if: github.event.pull_request.draft == false  # Draft PR은 제외
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
+      - name: AI Code Review with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # Progress tracking 활성화
+          track_progress: true
+
+          # 커스텀 리뷰 지시사항
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            이 PR의 변경사항을 철저히 분석하고 다음 관점에서 상세한 코드 리뷰를 수행해주세요:
+
+            ## 리뷰 기준
+
+            1. **코드 품질**
+               - 가독성 및 유지보수성
+               - 코드 복잡도와 구조
+               - 네이밍 컨벤션 준수
+
+            2. **잠재적 버그 및 안정성**
+               - 엣지 케이스 처리
+               - TypeScript 타입 안정성
+               - 에러 처리 및 예외 상황 대응
+
+            3. **성능 최적화**
+               - React 컴포넌트 렌더링 최적화
+               - 메모리 누수 가능성
+               - 불필요한 계산이나 리렌더링
+
+            4. **보안 취약점**
+               - XSS, CSRF 등 웹 보안 이슈
+               - 민감 정보 노출
+               - 의존성 보안 문제
+
+            5. **베스트 프랙티스**
+               - React/Next.js 최신 패턴 활용
+               - TypeScript 고급 기능 활용
+               - 코드 재사용성
+
+            ## 리뷰 방법
+            - 각 이슈에 대해 구체적인 파일명과 라인 번호를 명시
+            - 개선 방안을 코드 예제와 함께 제시
+            - 인라인 코멘트를 통해 구체적인 피드백 제공
+            - 심각도에 따라 이슈를 분류 (Critical/Warning/Info)
+
+          # Claude 도구 권한 설정
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+  # 패턴 기반 자동 코드 리뷰
+  pattern-review:
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Get changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v41
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
-    - name: Review PR
+    - name: Analyze and Review PR
       uses: actions/github-script@v7
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           const pr = context.payload.pull_request;
-          const changedFiles = `${{ steps.changed-files.outputs.all_changed_files }}`.split(' ');
 
-          // PR에 대한 전체 리뷰 코멘트
-          const reviewComment = {
+          // PR의 변경된 파일과 diff 가져오기
+          const { data: files } = await github.rest.pulls.listFiles({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            pull_number: pr.number,
-            body: `## 🤖 자동 코드 리뷰
+            pull_number: pr.number
+          });
 
-            PR #${pr.number}에 대한 자동 리뷰가 시작되었습니다.
-
-            ### 📝 변경된 파일
-            ${changedFiles.map(f => `- \`${f}\``).join('\n')}
-
-            ### ✅ 체크리스트
-            - [ ] 코드 스타일 가이드라인 준수
-            - [ ] 테스트 코드 포함 여부
-            - [ ] 문서 업데이트 필요 여부
-            - [ ] 성능 영향 검토`,
-            event: 'COMMENT'
+          const comments = [];
+          const summary = {
+            totalFiles: files.length,
+            additions: 0,
+            deletions: 0,
+            issues: {
+              critical: [],
+              warning: [],
+              info: []
+            }
           };
 
-          await github.rest.pulls.createReview(reviewComment);
+          // 각 파일 분석
+          for (const file of files) {
+            summary.additions += file.additions;
+            summary.deletions += file.deletions;
 
-          // TypeScript 파일 변경 시 타입 체크 관련 코멘트
-          const tsFiles = changedFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
-          if (tsFiles.length > 0) {
-            await github.rest.issues.createComment({
+            if (!file.patch) continue;
+
+            const fileExtension = file.filename.split('.').pop();
+            const lines = file.patch.split('\n');
+            let lineNumber = 0;
+            let inHunk = false;
+            let hunkStartLine = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+
+              // 새로운 hunk 시작
+              if (line.startsWith('@@')) {
+                const match = line.match(/@@ -\d+(?:,\d+)? \+(\d+)/);
+                if (match) {
+                  hunkStartLine = parseInt(match[1]);
+                  lineNumber = hunkStartLine - 1;
+                  inHunk = true;
+                }
+                continue;
+              }
+
+              if (!inHunk) continue;
+
+              // 추가된 라인만 검사
+              if (line.startsWith('+')) {
+                lineNumber++;
+                const codeContent = line.substring(1);
+
+                // JavaScript/TypeScript 파일 검사
+                if (['js', 'jsx', 'ts', 'tsx'].includes(fileExtension)) {
+
+                  // 1. console 문 검사
+                  if (codeContent.match(/console\.(log|warn|error|debug)/)) {
+                    const severity = codeContent.includes('console.error') ? 'info' : 'warning';
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `⚠️ **Console 문 발견**: 프로덕션 코드에서는 제거하거나 적절한 로깅 라이브러리를 사용해주세요.`
+                    });
+                    summary.issues[severity].push(`console문 사용: ${file.filename}:${lineNumber}`);
+                  }
+
+                  // 2. any 타입 사용 (TypeScript)
+                  if (['ts', 'tsx'].includes(fileExtension)) {
+                    if (codeContent.match(/:\s*any(?:\s|\[|\)|,|;|$)/)) {
+                      comments.push({
+                        path: file.filename,
+                        line: lineNumber,
+                        side: 'RIGHT',
+                        body: `🚨 **any 타입 사용**: 타입 안정성을 위해 구체적인 타입을 정의해주세요.\n\n예시:\n\`\`\`typescript\n// Bad\nconst data: any = response;\n\n// Good\ninterface ResponseData {\n  id: string;\n  // ... 필요한 속성 정의\n}\nconst data: ResponseData = response;\n\`\`\``
+                      });
+                      summary.issues.critical.push(`any 타입: ${file.filename}:${lineNumber}`);
+                    }
+                  }
+
+                  // 3. 비동기 처리 패턴
+                  if (codeContent.includes('.then(') && !codeContent.includes('.catch(')) {
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `⚠️ **에러 처리 누락**: Promise chain에 .catch() 또는 try-catch를 추가해주세요.`
+                    });
+                    summary.issues.warning.push(`에러 처리 누락: ${file.filename}:${lineNumber}`);
+                  }
+
+                  // 4. React 관련 패턴 (tsx 파일)
+                  if (fileExtension === 'tsx') {
+                    // useEffect 의존성 배열 검사
+                    if (codeContent.includes('useEffect(') && codeContent.includes('[]')) {
+                      comments.push({
+                        path: file.filename,
+                        line: lineNumber,
+                        side: 'RIGHT',
+                        body: `💡 **useEffect 의존성**: 빈 의존성 배열이 의도적인지 확인해주세요. ESLint의 exhaustive-deps 규칙 활용을 권장합니다.`
+                      });
+                      summary.issues.info.push(`useEffect 빈 의존성: ${file.filename}:${lineNumber}`);
+                    }
+
+                    // 인라인 함수 정의
+                    if (codeContent.match(/onClick=\{\s*\(/) || codeContent.match(/onChange=\{\s*\(/)) {
+                      comments.push({
+                        path: file.filename,
+                        line: lineNumber,
+                        side: 'RIGHT',
+                        body: `💡 **성능 최적화**: 인라인 함수는 매 렌더링마다 재생성됩니다. useCallback을 사용하거나 컴포넌트 외부에 정의하는 것을 고려해주세요.`
+                      });
+                      summary.issues.info.push(`인라인 함수: ${file.filename}:${lineNumber}`);
+                    }
+                  }
+
+                  // 5. 보안 관련
+                  if (codeContent.match(/dangerouslySetInnerHTML/)) {
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `🔒 **보안 주의**: dangerouslySetInnerHTML 사용 시 XSS 공격에 취약할 수 있습니다. DOMPurify 등의 sanitization 라이브러리 사용을 권장합니다.`
+                    });
+                    summary.issues.critical.push(`XSS 위험: ${file.filename}:${lineNumber}`);
+                  }
+
+                  // 6. 하드코딩된 값
+                  if (codeContent.match(/['"]https?:\/\/localhost/)) {
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `⚠️ **하드코딩된 URL**: 환경 변수를 사용해주세요 (예: process.env.NEXT_PUBLIC_API_URL)`
+                    });
+                    summary.issues.warning.push(`하드코딩된 localhost: ${file.filename}:${lineNumber}`);
+                  }
+                }
+
+                // CSS/SCSS 파일 검사
+                if (['css', 'scss', 'module.css', 'module.scss'].includes(fileExtension)) {
+                  // !important 사용
+                  if (codeContent.includes('!important')) {
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `💡 **CSS 우선순위**: !important 대신 더 구체적인 선택자를 사용하거나 CSS 구조를 개선해주세요.`
+                    });
+                    summary.issues.info.push(`!important 사용: ${file.filename}:${lineNumber}`);
+                  }
+                }
+
+                // 모든 파일 공통
+                // API 키나 시크릿 검사
+                if (codeContent.match(/(?:api[_-]?key|secret|password|token)\s*[:=]\s*['"][^'"]+['"]/i)) {
+                  if (!codeContent.includes('process.env') && !codeContent.includes('import.meta.env')) {
+                    comments.push({
+                      path: file.filename,
+                      line: lineNumber,
+                      side: 'RIGHT',
+                      body: `🚨 **보안 경고**: 민감한 정보가 하드코딩되어 있습니다. 반드시 환경 변수를 사용해주세요!`
+                    });
+                    summary.issues.critical.push(`민감정보 노출 위험: ${file.filename}:${lineNumber}`);
+                  }
+                }
+              } else if (line.startsWith('-')) {
+                // 삭제된 라인은 무시
+              } else {
+                // 변경되지 않은 라인
+                lineNumber++;
+              }
+            }
+          }
+
+          // 리뷰 결과 생성
+          let reviewBody = `## 🤖 자동 코드 리뷰 결과\n\n`;
+          reviewBody += `### 📊 변경 요약\n`;
+          reviewBody += `- 📁 변경된 파일: ${summary.totalFiles}개\n`;
+          reviewBody += `- ➕ 추가된 라인: ${summary.additions}\n`;
+          reviewBody += `- ➖ 삭제된 라인: ${summary.deletions}\n\n`;
+
+          if (summary.issues.critical.length > 0 ||
+              summary.issues.warning.length > 0 ||
+              summary.issues.info.length > 0) {
+
+            reviewBody += `### 🔍 발견된 이슈\n\n`;
+
+            if (summary.issues.critical.length > 0) {
+              reviewBody += `#### 🚨 Critical (${summary.issues.critical.length})\n`;
+              summary.issues.critical.forEach(issue => {
+                reviewBody += `- ${issue}\n`;
+              });
+              reviewBody += `\n`;
+            }
+
+            if (summary.issues.warning.length > 0) {
+              reviewBody += `#### ⚠️ Warning (${summary.issues.warning.length})\n`;
+              summary.issues.warning.forEach(issue => {
+                reviewBody += `- ${issue}\n`;
+              });
+              reviewBody += `\n`;
+            }
+
+            if (summary.issues.info.length > 0) {
+              reviewBody += `#### 💡 Info (${summary.issues.info.length})\n`;
+              summary.issues.info.forEach(issue => {
+                reviewBody += `- ${issue}\n`;
+              });
+              reviewBody += `\n`;
+            }
+
+            reviewBody += `### 💬 상세 리뷰\n`;
+            reviewBody += `각 파일의 구체적인 코멘트를 확인해주세요.\n\n`;
+
+            // 개선 제안
+            reviewBody += `### 📝 개선 제안\n`;
+            if (summary.issues.critical.length > 0) {
+              reviewBody += `- **보안 및 타입 안정성**: Critical 이슈를 우선적으로 해결해주세요\n`;
+            }
+            if (comments.some(c => c.body.includes('useCallback'))) {
+              reviewBody += `- **성능 최적화**: React 렌더링 최적화를 위해 메모이제이션을 고려해주세요\n`;
+            }
+            if (comments.some(c => c.body.includes('console'))) {
+              reviewBody += `- **로깅**: 프로덕션 환경을 위한 적절한 로깅 전략을 수립해주세요\n`;
+            }
+          } else {
+            reviewBody += `### ✅ 훌륭합니다!\n\n`;
+            reviewBody += `자동 검사 결과 특별한 이슈를 발견하지 못했습니다.\n\n`;
+            reviewBody += `검사 항목:\n`;
+            reviewBody += `- ✓ Console 문 사용\n`;
+            reviewBody += `- ✓ TypeScript any 타입\n`;
+            reviewBody += `- ✓ 에러 처리\n`;
+            reviewBody += `- ✓ React 최적화 패턴\n`;
+            reviewBody += `- ✓ 보안 취약점\n`;
+            reviewBody += `- ✓ 하드코딩된 값\n`;
+          }
+
+          // PR 리뷰 생성
+          if (comments.length > 0) {
+            await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: pr.number,
-              body: `### 🔍 TypeScript 파일 검토
-
-              다음 TypeScript 파일들이 변경되었습니다:
-              ${tsFiles.map(f => `- \`${f}\``).join('\n')}
-
-              타입 안정성을 확인해주세요.`
+              pull_number: pr.number,
+              event: 'COMMENT',
+              body: reviewBody,
+              comments: comments
+            });
+          } else {
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              event: 'COMMENT',
+              body: reviewBody
             });
           }
+
+          console.log(`✅ 리뷰 완료: ${comments.length}개의 코멘트 생성`);
