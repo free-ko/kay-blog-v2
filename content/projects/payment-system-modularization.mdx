@@ -1,0 +1,642 @@
+---
+title: "결제 시스템 모듈화"
+description: "확장 가능한 결제 시스템을 설계하고 구현한 경험"
+date: "2025-10-04 16:05:00"
+published: true
+---
+
+# 결제 시스템 모듈화
+
+기존 결제 시스템을 PortOne으로 마이그레이션하면서, 단순히 SDK만 교체하는 것이 아니라 **확장 가능한 구조**를 만들고자 했습니다. 새로운 결제 수단을 추가할 때마다 기존 코드를 수정해야 한다면, 그건 잘못된 설계라고 생각했기 때문입니다.
+
+<br />
+
+## 기존 시스템의 문제점
+
+처음 결제 시스템 코드를 봤을 때의 모습입니다.
+
+```typescript
+// 기존 방식
+const handlePayment = (paymentType: string) => {
+  if (paymentType === "BANK") {
+    // 계좌이체 로직
+    initBankSDK();
+    validateBankAccount();
+    processBankPayment();
+  } else if (paymentType === "CARD") {
+    // 카드 결제 로직
+    initCardSDK();
+    validateCardInfo();
+    processCardPayment();
+  } else if (paymentType === "CARD_EVENT") {
+    // 이벤트 카드 로직
+    initCardSDK();
+    applyEventDiscount();
+    processCardPayment();
+  }
+  // ... 더 많은 if-else
+};
+```
+
+모든 결제 수단이 하나의 거대한 함수 안에서 `if-else`로 처리되고 있었습니다. 얼핏 보면 현재 요구사항은 잘 맞추고 있는 것처럼 보이지만, 실제로 이 코드는 세 가지 근본적인 문제를 가지고 있었습니다.
+
+### 왜 이게 문제인가?
+
+**첫 번째는 확장성 문제입니다.** 토스페이를 추가해야 한다는 요구사항이 들어오면? 또 다른 `else if`를 추가해야 합니다. 네이버페이는? 또 `else if`입니다. 결제 수단이 추가될 때마다 이 함수는 계속 길어지고, 복잡도는 계속 높아집니다.
+
+**두 번째는 응집도 문제입니다.** 카드 결제 로직을 수정하려고 함수를 열면, 계좌이체와 페이팔 코드도 같이 보였습니다. 카드 결제와 전혀 관련 없는 맥락들이 한 곳에 모여 있어, 단일 책임 원칙(SRP)을 지키지 못한 구조라고 생각했습니다.
+
+**세 번째는 테스트 복잡도입니다.** 카드 결제만 테스트하고 싶은데, 전체 함수를 테스트해야 하는 상황이 발생했습니다. 각 결제 수단을 독립적으로 테스트할 수 없어 모듈 간 결합도가 높다고 판단했습니다.
+
+위 구조는 비즈니스가 빠르게 변화하는 환경에서 코드가 그 속도를 따라가지 못하게 만든다고 생각했습니다.
+새로운 결제 수단 추가 요청이 들어올 때마다 전체 로직을 다시 검토해야 했고, 수정 시간도 점점 길어졌습니다.
+그래서 단순히 PortOne SDK를 도입하는 것을 넘어, **구조 자체를 재설계**하기로 결심했습니다.
+
+<br />
+
+## 설계 원칙 세우기
+
+### 의존성이 없다는 것은 무엇일까?
+
+가장 먼저 고민한 것은 <b>"어떤 상태가 의존성이 없는 상태인가?</b>였습니다. 막연하게 "좋은 설계"를 목표로 하는 게 아니라, 명확한 기준이 필요했습니다. 그래서 세 가지 구체적인 기준을 세웠습니다.
+
+#### 1) 수평적 독립성
+
+```typescript
+// ❌ 의존성이 있는 예
+const bankPayment = () => {
+  // ...
+  if (someCondition) {
+    cardPayment(); // 다른 결제 수단을 알고 있음
+  }
+};
+
+// ✅ 독립적인 예
+const bankPayment = () => {
+  // 계좌이체만 신경씀
+};
+```
+
+각 결제 모듈이 다른 모듈을 `import`하거나 호출하는 순간, 의존성이 생깁니다. `bankPayment`가 `cardPayment`의 존재를 아는 순간, 두 모듈은 더 이상 독립적이지 않습니다.
+
+이 기준을 세운 이유는 카드 결제 로직을 수정할 때 계좌이체 코드까지 영향을 받으면 안 되기 때문이라고 생각했습니다.
+
+#### 2) 확장 시 수정 최소화
+
+새로운 결제 수단을 추가할 때, 기존 코드를 수정하지 않고 **새 코드만 추가**할 수 있어야 합니다.
+
+```typescript
+// ❌ 확장 시 기존 코드 수정 필요
+const getPaymentHandler = (type: string) => {
+  if (type === "BANK") return bankPayment;
+  if (type === "CARD") return cardPayment;
+  if (type === "TOSS") return tossPayment; // 기존 함수를 수정해야 함
+};
+
+// ✅ 확장 시 새 코드만 추가
+const paymentFunc = {
+  BANK: bankPayment,
+  CARD: cardPayment,
+  TOSS: tossPayment, // 기존 로직은 그대로, 새 항목만 추가
+};
+```
+
+`if-else` 방식은 확장할 때마다 함수를 열어서 수정해야 합니다. 하지만 객체 매핑 방식은 새로운 항목을 추가하기만 하면 됩니다. 기존 코드를 건드리지 않아, 기존 기능이 망가질 위험도 없다고 생각했습니다.
+
+#### 3) 공통 로직의 중앙화
+
+SDK 초기화, 에러 처리, 로딩 상태 같은 반복되는 로직은 한 곳에서 관리해야 한다고 생각합니다.
+
+```typescript
+// ❌ 각 모듈에서 반복
+const bankPayment = () => {
+  try {
+    // 로직
+  } catch (error) {
+    console.error(error); // 중복된 에러 처리
+  }
+};
+
+const cardPayment = () => {
+  try {
+    // 로직
+  } catch (error) {
+    console.error(error); // 똑같은 코드 반복
+  }
+};
+```
+
+각 결제 모듈마다 똑같은 에러 처리 코드를 복사-붙여넣기 하는 순간, 유지보수가 어려워진다고 생각합니다. 왜냐하면 에러 처리 방식을 바꾸려면 모든 결제 모듈을 찾아다니며 수정하기 때문입니다.
+
+이 세 가지 기준은 단순히 "좋은 코드"라는 막연한 목표가 아니라, **실제로 검증 가능한 구체적인 기준**이라고 생각했습니다.
+
+<br />
+
+## 설계 방향 결정하기
+
+### 구체적인 것에서 추상적인 것으로? 아니면 그 반대로?
+
+원칙을 세웠으니, 이제 실제로 어떻게 설계할지 고민해야 했습니다. 여기서 중요한 질문이 생겼습니다.
+
+**"현재 있는 결제 수단들의 공통점을 뽑아내서 추상화할까? 아니면 필요한 부품이 무엇인지부터 생각해볼까?"**
+
+흔히 추상화를 설명할 때 "공통점을 뽑아내라"고 합니다. 하지만 경험상 이 방식에는 함정이 있다고 생각합니다.
+
+#### 현재 요구사항에 갇히기 쉽다
+
+```typescript
+// 현재 요구사항: 카드, 계좌이체, 페이팔
+// 공통점: 모두 "결제"를 한다
+// 차이점: 결제 방식이 다르다
+
+interface PaymentMethod {
+  type: "BANK" | "CARD" | "PAYPAL";
+  process(): void;
+}
+```
+
+얼핏 보면 괜찮은 설계 같습니다. 현재 요구사항의 모든 케이스를 커버하고 있으니까요. 하지만 나중에 "토스페이도 추가해주세요"라는 요구사항이 들어오면?
+type에 'TOSS'를 추가해야 합니다. 이건 기존 인터페이스를 수정하는 것입니다.
+더 큰 문제는 이렇게 현재 요구사항에서 공통점을 뽑아내다 보면, **미래의 변경 가능성을 고려하기 어렵다**는 것입니다. 현대 카드, 계좌이체, 페이팔만 보고 있으니, 당연히 이 세 가지에 최적화된 설계를 하게 됩니다.
+
+#### 그래서 선택한 방향: 부품부터 생각하기
+
+대신 이렇게 접근했습니다.
+
+**"결제라는 기능을 구현하려면 어떤 부품들이 필요할까?"**
+
+- 결제 수단별 로직 (부품 1)
+- 결제 타입을 실제 로직에 매핑하는 방법 (부품 2)
+- 공통 상태 관리 (부품 3)
+
+이렇게 부품 단위로 생각하니, 각 부품을 어떻게 조립할지가 자연스럽게 보이기 시작했습니다. 그리고 이 과정에서 자연스럽게 "각 부품은 독립적이어야 한다"는 결론에 도달했습니다.
+
+### 여러 선택지를 놓고 고민하다
+
+각 결제 모듈을 어떤 형태로 만들 것인가? 세 가지 선택지를 놓고 고민했습니다.
+
+**Option 1: Class 기반**
+
+```typescript
+class BankPayment {
+  process() {
+    /* ... */
+  }
+}
+```
+
+- 장점: 상태 관리가 명확함, OOP 패러다임과 잘 맞음
+- 단점: React 함수형 컴포넌트와 스타일이 맞지 않음
+
+클래스는 강력하지만, 팀 프로젝트는 React 함수형 컴포넌트로 작성되어 있습니다. 갑자기 클래스를 도입하면 코드베이스의 일관성이 깨진다고 생각했습니다.
+
+**Option 2: Switch-Case**
+
+```typescript
+switch (paymentType) {
+  case "BANK":
+    return processBankPayment();
+  case "CARD":
+    return processCardPayment();
+}
+```
+
+- 장점: 단순하고 직관적
+- 단점: 여전히 한 곳에서 모든 케이스를 관리해야 함
+
+이 방식은 기존 `if-else`와 크게 다르지 않습니다. 새로운 결제 수단을 추가하려면 여전히 `switch` 문을 수정해야 합니다.
+
+**Option 3: 객체 매핑 (최종 선택)**
+
+```typescript
+const paymentFunc = {
+  [PAYMENT_TYPE.BANK]: bankPayment,
+  [PAYMENT_TYPE.CARD]: cardPayment,
+};
+```
+
+### 왜 객체 매핑을 선택했는가?
+
+세 가지 이유가 있었습니다.
+
+**첫째, 타입 안정성을 확보할 수 있습니다.**
+
+TypeScript의 `Record` 타입을 사용하면, 모든 결제 타입이 구현되었는지 컴파일 타임에 확인할 수 있습니다.
+
+```typescript
+type PaymentType = "BANK" | "CARD" | "PAYPAL";
+type PaymentFuncType = Record<PaymentType, () => void>;
+
+// 하나라도 빠지면 컴파일 에러!
+const paymentFunc: PaymentFuncType = {
+  BANK: bankPayment,
+  CARD: cardPayment,
+  // PAYPAL이 없으면 에러 발생
+};
+```
+
+실제로 개발하면서 이 타입 체크 덕분에 버그를 여러 번 예방했습니다. 새로운 결제 타입을 추가하고 구현을 깜빡했을 때, TypeScript가 즉시 알려주었습니다.
+
+**둘째, React 생태계와 조화를 이룹니다.**
+
+React의 함수형 프로그래밍 스타일과 잘 맞았고, 커스텀 훅과 함께 사용하기 자연러웠습니다.
+
+**셋째, 확장이 정말 쉽습니다.**
+
+```typescript
+// 토스페이 추가하기
+const paymentFunc = {
+  BANK: bankPayment,
+  CARD: cardPayment,
+  PAYPAL: paypalPayment,
+  TOSS: tossPayment, // 한 줄 추가로 끝
+};
+```
+
+새 결제 수단은 객체에 한 줄만 추가하면 됩니다. 기존 코드는 전혀 건드리지 않습니다.
+
+<br />
+
+## 구현하기
+
+### usePortOne Hook: 결제 로직의 중심
+
+설계 원칙을 바탕으로 `usePortOne` 훅을 만들었습니다.
+
+```typescript
+import { useState } from "react";
+
+const PAYMENT_TYPE = {
+  BANK: "BANK",
+  CARD: "CARD",
+  CARD_EVENT: "CARD_EVENT",
+  CARD_HYUNDAI: "CARD_HYUNDAI",
+  PAYPAL: "PAYPAL",
+} as const;
+
+type PaymentType = (typeof PAYMENT_TYPE)[keyof typeof PAYMENT_TYPE];
+
+interface IPaymentsFuncProps {
+  paymentType: PaymentType;
+  setIsRequestingPayment: (isRequesting: boolean) => void;
+}
+
+export const usePortOne = ({
+  paymentType,
+  setIsRequestingPayment,
+}: IPaymentsFuncProps) => {
+  const bankPayment = () => {
+    // 계좌이체 로직 구현
+  };
+
+  const cardPayment = () => {
+    // 카드 결제 로직 구현
+  };
+
+  const paypalPayment = () => {
+    // PayPal 결제 로직 구현
+  };
+
+  // 핵심: 결제 타입별 함수 매핑
+  return {
+    paymentFunc:
+      {
+        [PAYMENT_TYPE.BANK]: bankPayment,
+        [PAYMENT_TYPE.CARD]: cardPayment,
+        [PAYMENT_TYPE.CARD_EVENT]: cardPayment, // 동일 로직 재사용
+        [PAYMENT_TYPE.CARD_HYUNDAI]: cardPayment, // 동일 로직 재사용
+        [PAYMENT_TYPE.PAYPAL]: paypalPayment,
+      }[paymentType] || null,
+  };
+};
+```
+
+### 각 결제 함수를 왜 훅 내부에 정의했는가?
+
+이 부분도 고민이 많았습니다. 각 결제 함수를 별도 파일로 분리하는 게 일반적인라고 생각을 했습니다.
+
+```typescript
+// 별도 파일로 분리하는 방식
+// payments/bankPayment.ts
+export const bankPayment = () => {
+  /* ... */
+};
+
+// usePortOne.ts
+import { bankPayment } from "./payments/bankPayment";
+```
+
+하지만 훅 내부에 정의하는 방식을 선택했습니다. 그 이유는 아래와 같습니다.
+
+**첫째, 클로저를 활용할 수 있기 때문입니다.**
+
+훅의 상태(`setIsRequestingPayment` 등)에 직접 접근할 수 있습니다. 별도 파일로 분리하면 props를 통해 계속 전달해야 하는 부분이 발생하게 됩니다.
+
+```typescript
+// 훅 내부 정의: 상태에 바로 접근
+const bankPayment = () => {
+  setIsRequestingPayment(true);
+  // ...
+  setIsRequestingPayment(false);
+};
+
+// 별도 파일: props로 전달해야 함
+export const bankPayment = (setIsRequesting: Function) => {
+  setIsRequesting(true);
+  // ...
+};
+```
+
+**둘째, 응집도가 높아지기 때문입니다.**
+
+결제 관련 로직이 한 곳에 모여 있어서 전체 흐름을 파악하기 쉽습니다. 파일을 여러 개로 나누면, 코드를 이해하기 위해 여러 파일을 왔다갔다 해야 합니다.
+
+물론 이건 현재 코드 규모에서의 판단이었습니다. 각 결제 함수가 500줄 이상으로 커진다면? 그때는 분리를 고려해야 한다고 생각합니다. **하지만 지금은 명확성을 우선했습니다.**
+
+<br />
+
+## 실제 사용: 추상화의 효과
+
+컴포넌트에서 어떻게 사용하는지 살펴보겠습니다.
+
+```typescript
+"use client";
+
+import { useState } from "react";
+import { usePortOne } from "@/hooks/usePortOne";
+
+const PaymentPage = () => {
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentType>("CARD");
+
+  const { paymentFunc } = usePortOne({
+    paymentType: selectedPayment,
+    setIsRequestingPayment: setIsRequesting,
+  });
+
+  const handlePayment = async () => {
+    if (!paymentFunc) {
+      alert("지원하지 않는 결제 수단입니다.");
+      return;
+    }
+
+    try {
+      await paymentFunc();
+    } catch (error) {
+      console.error("결제 실패:", error);
+    }
+  };
+
+  return (
+    <div>
+      <select
+        value={selectedPayment}
+        onChange={(e) => setSelectedPayment(e.target.value)}
+      >
+        <option value="CARD">카드</option>
+        <option value="BANK">계좌이체</option>
+        <option value="PAYPAL">PayPal</option>
+      </select>
+
+      <button onClick={handlePayment} disabled={isRequesting}>
+        {isRequesting ? "결제 중..." : "결제하기"}
+      </button>
+    </div>
+  );
+};
+```
+
+위 컴포넌트를 작성하는 개발자가 아래 3가지를 알 필요가 없어, 추상화의 효과가 드러난다고 생각합니다.
+
+- PortOne SDK의 내부 동작 방식
+- 각 결제 수단의 구체적인 API 호출 방법
+- 결제 검증 로직의 세부사항
+
+<br />
+
+## 설계 검증: 토스페이 추가하기
+
+<b>토스페이를 추가한다면?</b>과 같은 상황이 왔을 때, 설계가 잘 됐는지 확인하기
+아래 시나리오로 검증해봤습니다.
+
+### 필요한 변경사항
+
+```typescript
+// 1. 타입 추가 (constants.ts)
+const PAYMENT_TYPE = {
+  BANK: "BANK",
+  CARD: "CARD",
+  PAYPAL: "PAYPAL",
+  TOSS: "TOSS", // 추가
+} as const;
+
+// 2. 결제 함수 추가 (usePortOne.ts)
+const usePortOne = () => {
+  // ... 기존 함수들
+
+  const tossPayment = () => {
+    // 토스페이 로직
+  };
+
+  return {
+    paymentFunc: {
+      [PAYMENT_TYPE.BANK]: bankPayment,
+      [PAYMENT_TYPE.CARD]: cardPayment,
+      [PAYMENT_TYPE.PAYPAL]: paypalPayment,
+      [PAYMENT_TYPE.TOSS]: tossPayment, // 추가
+    },
+  };
+};
+```
+
+### 변경하지 않는 것들
+
+- ✅ `bankPayment`, `cardPayment`, `paypalPayment` 함수
+- ✅ 기존 테스트 코드
+- ✅ 컴포넌트에서 사용하는 방식
+
+**총 변경: 약 10줄**
+
+만약 기존 `if-else` 구조였다면?
+
+```typescript
+// 기존 방식이었다면...
+const handlePayment = (paymentType: string) => {
+  if (paymentType === "BANK") {
+    /* ... */
+  } else if (paymentType === "CARD") {
+    /* ... */
+  } else if (paymentType === "PAYPAL") {
+    /* ... */
+  } else if (paymentType === "TOSS") {
+    /* 새로 추가 */
+  } // 기존 함수 수정
+
+  // 이 함수를 사용하는 모든 곳도 영향받음
+};
+```
+
+**총 변경: 50줄 이상 + 전체 로직 이해 필요**
+
+`10줄 vs 50`줄의 차이는 단순히 코드 양의 차이가 아니라, `코드를 이해하는데 필요한 시간`의 차이라고 생각합니다.
+
+기존 방식은 전체 함수를 열어서 이해하고, 다른 결제 수단에 영향을 주지 않는지 확인하고, 테스트를 다시 돌려봐야 합니다.
+
+하지만 새로운 방식은 그저 객체에 한 줄을 추가하면 됩니다. TypeScript가 타입 체크를 해주고, 기존 코드에 영향을 주지 않습니다.
+
+<br />
+
+## 테스트 전략
+
+각 결제 모듈이 독립적이기 때문에, 테스트도 간단해졌습니다.
+
+```typescript
+describe("usePortOne", () => {
+  beforeEach(() => {
+    window.IMP = {
+      init: jest.fn(),
+      request_pay: jest.fn(),
+    };
+  });
+
+  describe("bankPayment", () => {
+    it("계좌이체 결제 함수를 반환해야 한다", () => {
+      const { result } = renderHook(() =>
+        usePortOne({
+          paymentType: "BANK",
+          setIsRequestingPayment: jest.fn(),
+        })
+      );
+
+      expect(result.current.paymentFunc).toBeDefined();
+      expect(typeof result.current.paymentFunc).toBe("function");
+    });
+  });
+
+  describe("여러 카드 타입", () => {
+    it("동일한 함수를 사용해야 한다", () => {
+      const { result: cardResult } = renderHook(() =>
+        usePortOne({ paymentType: "CARD", setIsRequestingPayment: jest.fn() })
+      );
+
+      const { result: eventResult } = renderHook(() =>
+        usePortOne({
+          paymentType: "CARD_EVENT",
+          setIsRequestingPayment: jest.fn(),
+        })
+      );
+
+      expect(cardResult.current.paymentFunc).toBe(
+        eventResult.current.paymentFunc
+      );
+    });
+  });
+});
+```
+
+`CARD와 CARD_EVENT`가 같은 함수를 참조하는지 확인하는 테스트인데, 이는 설계 의도(로직 재사용)를 검증하는 테스트입니다.
+
+<br />
+
+## 개선 효과
+
+**개발 생산성**
+
+- 이전에는 새 결제 수단을 추가하려면 전체 로직을 이해하고, 어디에 코드를 추가해야 할지 찾고, 사이드 이펙트가 없는지 확인하는 과정이 필요했습니다. 하지만 지금은 그저 새 함수를 작성하고 객체에 추가하면 됩니다.
+
+**유지보수성**: 한 파일에서 모든 결제 수단을 관리하던 구조에서, 각 모듈을 독립적으로 수정할 수 있게 되었습니다. 카드 결제에 버그가 있으면 `cardPayment` 함수만 보면 됩니다.
+
+**확장성**: 실제로 토스페이를 추가하는 기존 전체 로직을 이해하고, 개발할 필요 없이 개발을 진행하면 됩니다.
+
+**팀 협업**: 여러 개발자가 동시에 다른 결제 수단을 작업할 수 있게 되었습니다. 각자 자신의 결제 함수만 작성하면 되니, 코드 충돌도 거의 없습니다.
+코드 리뷰 범위도 축소되어, 리뷰어는 해당 결제 수단 코드만 집중해서 볼 수 있습니다.
+
+<br />
+
+## 아직 완벽하지 않다
+
+### 현재 한계점과 개선 방향
+
+**에러 처리 표준화 부족**
+
+현재는 각 모듈에서 개별적으로 에러를 처리하고 있습니다. 이는 일관성을 해치는 문제를 만들 수 있다고 생각합니다.
+
+```typescript
+// 현재: 각자 처리
+const bankPayment = () => {
+  try {
+    // ...
+  } catch (error) {
+    console.error(error); // 일관성 없음
+  }
+};
+
+// 개선 방향: 공통 핸들러
+const withErrorHandler = (paymentFn: PaymentFunction) => {
+  return async () => {
+    try {
+      return await paymentFn();
+    } catch (error) {
+      handlePaymentError(error); // 표준화된 처리
+    }
+  };
+};
+```
+
+**결제 검증 로직 분산**
+
+각 모듈에서 개별적으로 검증하는 대신, 공통 Validator를 만들어서 추상화 시킬 수 있다고 생각합니다.
+예를 들어 카드 결제와 계좌이체 모두 "금액이 0보다 큰가?"를 검증해야 한다면, 이는 공통 로직으로 빼서 사용하면 좋다고 생각합니다.
+
+**타입 정의 개선**
+더 엄격한 타입 시스템으로 각 결제 수단의 특성을 더 명확하게 표현할 수 있습니다.
+
+```typescript
+// 현재
+type PaymentType = "BANK" | "CARD" | "PAYPAL";
+
+// 개선 가능
+interface PaymentMethod<T extends PaymentType> {
+  type: T;
+  validator: PaymentValidator<T>;
+  processor: PaymentProcessor<T>;
+}
+```
+
+<br />
+
+## 배운 점
+
+### 의존성 제거는 구체적인 기준이 필요하다
+
+처음에는 막연하게 "좋은 설계"를 하고 싶었습니다. 하지만 "좋은 설계"가 뭔지 정의하지 않으면, 결국 감에 의존하게 된다는 사실을 알게 되었습니다.
+
+그래서 세운 것이 세 가지 구체적인 기준(수평적 독립성, OCP, DRY)입니다. 이 기준 덕분에 코드 리뷰를 할 때도 명확한 근거를 가지고 피드백할 수 있었습니다.
+
+### 추상화는 문제를 해결하기 위한 도구다
+
+처음부터 완벽한 추상화를 목표로 하지 않았습니다. 현재 문제(`if-else` 체인, 코드 중복)를 해결하는 데 집중했고, 그 과정에서 자연스럽게 좋은 추상화가 나왔다고 생각합니다.
+
+만약 처음부터 "완벽한 추상화"를 목표로 했다면, 오히려 과도한 추상화로 코드가 복잡해졌을 수도 있다고 생각합니다.
+
+### 확장성은 검증 가능해야 한다
+
+<b>"확장 가능하다"</b>는 말은 추상적입니다. 그래서 실제 시나리오(토스페이
+추가)로 검증했습니다. 적은 수의 코드 추가로 새 기능을 넣을 수 있다는 것을
+확인하니, 설계가 잘 됐다는 확신이 생겼습니다.
+
+<br />
+
+## 마치며
+
+이번 결제 시스템 모듈화를 하면서 깨달은 것은, <b>좋은 설계는 "완벽한 것"이 아니라 "변경하기 쉬운 것"</b>이라는 점이었습니다.
+
+처음에는 막연하게 "깔끔한 코드"를 목표로 했습니다. 하지만 구체적인 기준(독립성, 확장 시 수정 최소화, 중복 제거)을 세우고 나니, 설계 결정을 내릴 때마다 명확한 근거를 가질 수 있었습니다.
+
+앞으로는 <b>"미래를 예측하려 하지 말고, 현재의 변경을 쉽게 만들자"</b>는 원칙으로 개발하겠습니다.
+
+<br />
+
+### 참고
+
+- [추상이란 무엇일까](https://evan-moon.github.io/2023/01/15/what-is-abstract/)
