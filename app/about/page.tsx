@@ -15,7 +15,7 @@ export default function About() {
           </h1>
           <div className="space-y-3 sm:space-y-4 text-gray-300 leading-relaxed text-sm sm:text-base">
             <p>
-              저는 기술로 사람들의 <b>일상을 편리하게 만드는 게</b> 개발자의
+              저는 기술로 사람들의 <b>일상을 편리하게 만드는 것이</b> 개발자의
               역할이라고 생각합니다.
               <br />
               특히 <b>동료들과 고민하며</b>,{" "}
@@ -35,7 +35,7 @@ export default function About() {
               만듭니다.
               <br />
               이러한 협업의 과정 속에서 사용자의 일상에 도움을 주는 서비스가
-              탄생한다고 믿습니다.
+              탄생한다고 생각합니다.
             </p>
           </div>
         </header>
@@ -72,14 +72,14 @@ export default function About() {
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                   프로젝트 초기 단계에서 네트워크 연결 끊김, API 응답 지연 및
-                  실패, 웹뷰 브라우저 히스토리 처리 등 예외 상황에 대한 상세 UX
-                  플로우를 주도적으로 제안해 기획을 보완했습니다.
+                  실패, 웹뷰 브라우저 히스토리 처리 등 예외 상황에 대한 UX
+                  플로우를 적극적으로 제안했습니다.
                   <br />
                   덕분에 사용자가 예상치 못한 상황에서도 자연스럽게 서비스를
                   이용할 수 있게 되었습니다.
                   <br />
                   개발 과정에서는 토스 웹뷰의 복잡한 뒤로가기 이벤트 핸들링을
-                  추상화한 커스텀 훅을 만들어 팀 전체의 개발 속도를 높였습니다.
+                  커스텀 훅으로 추상화하여 팀 전체의 개발 속도를 높였습니다.
                   <br />
                   또한 .ait 파일을 매번 수동으로 배포 콘솔에 업로드하는 비효율을
                   발견하고, 앱인토스팀에 자동화 SDK 제공을 제안해 향후 배포
@@ -88,7 +88,7 @@ export default function About() {
               </div>
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  웹팀 업무 프로세스 개선 및 리소스 최적화
+                  업무 프로세스 개선
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                   팀원들이 각자 겪은 에러, 업무 중 공유할 사항, 어려운 부분을
@@ -197,7 +197,7 @@ export default function About() {
                   다른 프로젝트와 기술 스택이 달라 코드 재사용도 불가능했습니다.
                   <br />
                   이를 해결하기 위해 팀이 이미 사용 중인 Next.js로
-                  마이그레이션을 주도했습니다. 익숙한 기술 스택으로 전환하면서
+                  마이그레이션을 진행했습니다. 익숙한 기술 스택으로 전환하면서
                   기존 프로젝트의 컴포넌트와 유틸을 재사용할 수 있게 되었고,
                   어드민 수정 작업 시 발생하던 러닝커브를 없애 개발 속도를 크게
                   높였습니다.
@@ -206,7 +206,7 @@ export default function About() {
 
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
-                  어드민 배포 프로세스 최적화
+                  배포 프로세스 최적화
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                   어드민 시스템의 빌드 시간이 6분에 달해, 하루 평균 7-8회 배포
