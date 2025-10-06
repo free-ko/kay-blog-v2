@@ -1,0 +1,460 @@
+---
+title: "React-Search-Autocomplete 분석 및 자체 구현하기"
+description: "외부 라이브러리의 성능 문제를 분석하고 자체 컴포넌트로 개선한 경험"
+date: "2025-10-06"
+published: true
+---
+
+# React-Search-Autocomplete 분석 및 커스텀하기
+
+검색 기능을 개발하면서, `react-search-autocomplete` 라이브러리를 도입했습니다. 하지만 사용자가 입력할 때마다 UI가 눈에 띄게 버벅였고, React DevTools는 성능 경고를 표시했습니다.
+
+**측정 결과:**
+
+- 한 글자 입력 시 3-4회 리렌더링
+- "세차" 두 글자 입력 시 6-8회 리렌더링
+- 평균 응답 시간 120-150ms (목표: 50ms 이하)
+
+이러한 입력 지연은 사용자 경험에 부정적인 영향을 준다고 판단했습니다. 근본 원인을 파악하기 위해 라이브러리 내부 코드를 분석하기로 했습니다.
+
+<br />
+
+## 라이브러리 분석 프로세스
+
+### 렌더링 추적
+
+컴포넌트의 모든 `useEffect`에 로그를 추가하여 실행 순서를 추적했습니다.
+
+```typescript
+useEffect(() => {
+  console.log("Effect 1: inputSearchString changed", inputSearchString);
+}, [inputSearchString]);
+
+useEffect(() => {
+  console.log("Effect 2: items changed", items.length);
+}, [items]);
+```
+
+**결과:**
+
+```
+Effect 1: inputSearchString changed "세"
+Effect 2: items changed 1000
+Effect 3: results updated []
+Effect 4: showNoResults updated true
+```
+
+한 글자 입력에 4개의 effect가 순차적으로 실행되고 있었습니다.
+
+### 상태 의존성 분석
+
+7개의 상태가 어떻게 연결되어 있는지 정리했습니다.
+
+```
+[사용자 입력]
+    ↓
+searchString 변경
+    ↓
+    ├─→ isTyping = true
+    ↓
+handleOnSearch (debounced)
+    ↓
+results 업데이트
+    ↓
+    ├─→ isSearchComplete 업데이트
+    ├─→ showNoResultsFlag 계산
+    │   └─→ (4개 상태에 의존)
+    └─→ highlightedItem 초기화
+```
+
+### 성능 병목 지점 측정
+
+`React Profiler`로 각 함수의 실행 시간을 측정했습니다.
+
+| 함수               | 호출 횟수 (5글자 입력) | 총 소요 시간 |
+| ------------------ | ---------------------- | ------------ |
+| Fuse 인스턴스 생성 | 20회                   | 600ms        |
+| fuseResults        | 15회                   | 225ms        |
+| useEffect 체인     | 45회                   | 180ms        |
+| **합계**           | **80회**               | **1005ms**   |
+
+<br />
+
+## 핵심 문제 파악
+
+### 문제 1: 매 렌더링마다 Fuse 인스턴스 재생성
+
+```typescript
+// 컴포넌트 함수 내부에서 직접 생성
+export default function ReactSearchAutocomplete({ items }) {
+  const fuse = new Fuse(items, options); // 렌더링마다 실행
+}
+```
+
+`Fuse.js`는 초기화 시 모든 아이템을 인덱싱합니다. 1000개 아이템 기준 약 30ms가 소요되며, 입력할 때마다 이 비용이 반복되고 있었습니다.
+
+### 문제 2: 범용성을 위한 다양한 기능
+
+라이브러리는 7개의 상태를 관리하고 있었습니다:
+
+```typescript
+const [searchString, setSearchString] = useState("");
+const [results, setResults] = useState([]);
+const [highlightedItem, setHighlightedItem] = useState(-1);
+const [isSearchComplete, setIsSearchComplete] = useState(false);
+const [isTyping, setIsTyping] = useState(false);
+const [showNoResultsFlag, setShowNoResultsFlag] = useState(false);
+const [hasFocus, setHasFocus] = useState(false);
+```
+
+이 상태들은 범용 라이브러리로서 다양한 사용 케이스를 지원하기 위한 설계였습니다:
+
+| 상태/기능                            | 제공 목적                        |
+| ------------------------------------ | -------------------------------- |
+| `showIcon`, `showClear`              | 아이콘 표시 옵션 커스터마이징    |
+| `showNoResults`, `showNoResultsText` | "결과 없음" UI 커스터마이징      |
+| `showItemsOnFocus`                   | 포커스 시 전체 목록 표시 기능    |
+| `isTyping`, `isSearchComplete`       | `onSearch` 콜백의 메타 정보 제공 |
+| `hasFocus`                           | 외부에서 포커스 상태 추적 지원   |
+
+### 개발하려는 기능의 불일치
+
+**실제 필요한 기능:**
+
+1. 검색어 입력 시 실시간 필터링
+2. 키보드로 항목 탐색 (↑↓)
+3. Enter로 선택
+4. 선택 시 콜백 호출
+
+**사용하지 않는 기능:**
+
+- 아이콘 표시/숨김 옵션 (디자인 확정됨)
+- "결과 없음" 텍스트 커스터마이징 (표준 문구 사용)
+- 포커스 시 전체 목록 표시 (UX 상 불필요)
+- Clear 버튼 (디자인에 없음)
+- isTyping, isSearchComplete (외부에서 미사용)
+- 외부에서 검색어 제어 (내부 상태로만 관리)
+
+**의존성 체인:**
+
+```
+1. 사용자 "세" 입력 → searchString 업데이트
+2. searchString 변경 감지 → isTyping = true (리렌더링 #1)
+3. handleOnSearch 실행 → results 업데이트 (리렌더링 #2)
+4. results 변경 감지 → showNoResultsFlag 계산 (리렌더링 #3)
+5. isTyping 변경 감지 → showNoResultsFlag 재계산 (리렌더링 #4)
+```
+
+라이브러리 기능의 20%만 사용하면서도 모든 상태 관리 비용을 지불하고 있었습니다.
+
+### 문제 3: 다양한 사용 패턴 지원을 위한 중복 검색
+
+세 가지 다른 케이스에서 검색을 실행하고 있었습니다:
+
+```typescript
+// 케이스 1: 외부에서 inputSearchString prop으로 제어
+useEffect(() => {
+  setResults(fuseResults(inputSearchString));
+}, [inputSearchString]);
+
+// 케이스 2: items가 동적으로 변경되는 경우
+useEffect(() => {
+  setResults(fuseResults(searchString));
+}, [items]);
+
+// 케이스 3: 사용자가 직접 입력
+const handleOnSearch = debounce(
+  (keyword) => setResults(fuseResults(keyword)),
+  200
+);
+```
+
+제가 개발하는 기능에서는 사용자 입력 케이스만 필요했습니다.
+
+<br />
+
+## 해결 방향 설정
+
+### 라이브러리 최적화 vs 자체 구현
+
+두 가지 선택지를 검토했습니다.
+
+**Option 1: 라이브러리 최적화**
+
+- 사용하지 않는 기능 비활성화
+- props로 최소 기능만 활성화
+- 장점: 기존 라이브러리 유지
+- 단점: 근본적인 구조는 동일, 불필요한 코드 존재
+
+**Option 2: 자체 컴포넌트 구현**
+
+- 필요한 기능만 구현
+- 서비스에 최적화
+- 장점: 완전한 제어, 최소 코드
+- 단점: 직접 유지보수 필요
+
+자체 구현을 선택한 이유:
+
+1. **사용률**: 라이브러리 기능의 20%만 사용
+2. **단순성**: 검색, 키보드 네비게이션, 결과 표시만 구현하면 됨 (약 120줄)
+3. **안정성**: 검색 기능의 UX는 확정되어 큰 변경 가능성 없음
+
+### 설계 원칙
+
+**1. 상태 최소화**
+
+```typescript
+// 파생 가능한 상태를 별도 관리하지 않음
+const showNoResults = inputValue.length > 0 && results.length === 0;
+```
+
+**2. 이벤트 중심 처리**
+
+상태 동기화를 위한 `useEffect` 대신, 이벤트 핸들러에서 직접 처리합니다.
+
+**3. 무거운 연산 메모이제이션**
+
+생성 비용이 큰 객체는 `useMemo`로 캐싱합니다.
+
+<br />
+
+## 구현
+
+### 개선 1: 상태를 3개로 축소
+
+```typescript
+// 필수 상태만 유지
+const [inputValue, setInputValue] = useState(""); // 검색어
+const [results, setResults] = useState<T[]>([]); // 검색 결과
+const [selectedIndex, setSelectedIndex] = useState(-1); // 키보드 탐색용
+
+// 파생 값은 계산으로 처리
+const showResults = results.length > 0;
+const showNoResults = inputValue.length > 0 && results.length === 0;
+```
+
+**제거한 상태:**
+
+| 상태                | 제거 이유                              |
+| ------------------- | -------------------------------------- |
+| `isTyping`          | onSearch 콜백을 외부에서 사용하지 않음 |
+| `isSearchComplete`  | 검색 완료 여부 추적 불필요             |
+| `showNoResultsFlag` | `inputValue`와 `results`로 계산 가능   |
+| `hasFocus`          | 포커스 시 특별한 동작 없음             |
+
+### 개선 2: Fuse 인스턴스 메모이제이션
+
+```typescript
+const fuse = useMemo(
+  () =>
+    new Fuse(items, {
+      keys: [searchKey],
+      threshold: 0.3,
+      ignoreLocation: true,
+    }),
+  [items, searchKey]
+);
+```
+
+**효과:**
+
+- 리렌더링 시 인스턴스 재사용
+- 초기화 비용 30ms → 0ms (캐시 hit 시)
+
+### 개선 3: 검색 로직 단일화
+
+```typescript
+const search = useCallback(
+  (keyword: string) => {
+    if (!keyword.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const searchResults = fuse
+      .search(keyword, { limit: 10 })
+      .map((result) => result.item);
+
+    setResults(searchResults);
+  },
+  [fuse]
+);
+
+const debouncedSearch = useMemo(() => debounce(search, 200), [search]);
+
+const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  setInputValue(e.target.value);
+  debouncedSearch(e.target.value);
+};
+```
+
+**효과:**
+
+- `useEffect` 제거 (6개 → 0개)
+- 명확한 데이터 흐름: 입력 → `debounce` → 검색 → 결과
+
+### 개선 4: 간결한 API
+
+```typescript
+interface AutocompleteProps<T> {
+  items: T[];
+  onSelect: (item: T) => void;
+  searchKey: keyof T;
+  placeholder?: string;
+}
+```
+
+**Before (20개 이상의 props):**
+
+```typescript
+<ReactSearchAutocomplete
+  items={vehicleClasses}
+  fuseOptions={{ threshold: 0.3 }}
+  inputDebounce={200}
+  onSearch={...}
+  onHover={...}
+  onSelect={...}
+  onFocus={...}
+  onClear={...}
+  showIcon={true}
+  showClear={true}
+  maxResults={10}
+  // ... 10개 더
+/>
+```
+
+**After (4개의 props):**
+
+```typescript
+<Autocomplete
+  items={vehicleClasses}
+  onSelect={handleSelect}
+  searchKey="name"
+  placeholder="검색..."
+/>
+```
+
+<br />
+
+## 개선 결과
+
+### 성능 지표
+
+| 지표                   | 기존  | 개선  | 개선율 |
+| ---------------------- | ----- | ----- | ------ |
+| 1글자 입력 시 리렌더링 | 3-4회 | 1회   | 75% ↓  |
+| 평균 응답 시간         | 120ms | 35ms  | 70% ↓  |
+| 상태 개수              | 7개   | 3개   | 57% ↓  |
+| useEffect 개수         | 6개   | 0개   | 100% ↓ |
+| 코드 라인 수           | 280줄 | 120줄 | 57% ↓  |
+| 필요한 props           | 20개+ | 4개   | 80% ↓  |
+
+### 사용자 경험
+
+**Before:**
+
+```
+사용자 입력: "세차"
+- 0ms: '세' 입력
+- 50ms: 화면 버벅임 시작
+- 150ms: 첫 번째 결과 표시
+- 200ms: '차' 입력
+- 350ms: 버벅임
+- 450ms: 두 번째 결과 표시
+```
+
+**After:**
+
+```
+사용자 입력: "세차"
+- 0ms: '세' 입력
+- 35ms: 첫 번째 결과 표시
+- 200ms: '차' 입력
+- 235ms: 두 번째 결과 표시
+```
+
+<br />
+
+## 배운점
+
+### 1. 범용성과 특수성의 트레이드오프
+
+외부 라이브러리는 다양한 사용자를 지원하기 위해 많은 기능을 제공합니다.
+
+```typescript
+// 범용 라이브러리
+// 결과: 7개의 상태, 20개의 props, 6개의 useEffect
+
+// 맞춤 컴포넌트
+// 결과: 3개의 상태, 4개의 props, 0개의 useEffect
+```
+
+**자체 구현 고려 기준:**
+
+- 라이브러리 기능의 30% 미만 사용
+- 미사용 기능이 성능에 영향
+- 코어 로직이 200줄 미만
+- 요구사항이 명확하고 안정적
+
+**라이브러리 유지 기준:**
+
+- 복잡한 도메인 로직 (date picker, WYSIWYG editor 등)
+- 기능의 70% 이상 활용
+- 활발한 유지보수와 큰 커뮤니티
+- Critical한 보안이나 접근성 요구사항
+
+### 2. 상태 설계의 중요성
+
+"상태가 많으면 나쁘다"가 아니라, **불필요한 상태가 많으면 나쁘다**라는 사실을 알게 되었습니다.
+
+범용 라이브러리에서 7개 상태는 합리적인 선택입니다. 하지만 제가 개발하는 기능에는 3개면 충분했습니다.
+
+### 3. 동기화보다 계산
+
+`useEffect`로 여러 상태를 동기화하는 것보다, 다른 상태로부터 값을 계산하는 것이 단순하고 예측 가능하다고 생각합니다.
+
+```typescript
+// 복잡한 동기화
+useEffect(() => {
+  if (showNoResults && searchString && !isTyping && !isSearchComplete) {
+    setShowNoResultsFlag(true);
+  } else {
+    setShowNoResultsFlag(false);
+  }
+}, [showNoResults, searchString, isTyping, isSearchComplete]);
+
+// 단순한 계산
+const showNoResultsFlag = inputValue.length > 0 && results.length === 0;
+```
+
+### 4. 메모이제이션 전략
+
+React는 함수 컴포넌트를 매 렌더링마다 실행합니다. 생성 비용이 큰 객체는 메모이제이션이 필요합니다.
+
+```typescript
+// 매 렌더링마다 생성 (30ms)
+const fuse = new Fuse(items, options);
+
+// 의존성 변경 시에만 생성
+const fuse = useMemo(() => new Fuse(items, options), [items]);
+```
+
+<br />
+
+## 마치며
+
+이번 검색 기능 개발을 통해 **언제 라이브러리를 사용하지 말아야 하는지** 아는 것도 중요한 개발 역량이라는 것을 배웠습니다.
+처음에는 막연하게 "이 라이브러리가 느리니 최적화해야지"라고 생각했습니다. 하지만 코드를 분석하면서 깨달은 것은, `react-search-autocomplete`는 범용 라이브러리로서 잘 설계되었다는 점이었습니다.
+다만 제가 개발하는 기능의 요구사항에는 과도한 기능을 제공하고 있었을 뿐이었습니다.
+
+이번 경험에서 가장 중요하게 배운 점은 `맥락의 중요성`입니다. 같은 라이브러리도 어떤 프로젝트에서는 완벽한 선택이, 다른 프로젝트에서는 성능 병목이 될 수 있습니다.
+라이브러리를 선택하기 전에 **내가 개발하는 것에 정말 필요한 기능이 무엇인지** 먼저 정확히 파악하는 것이 중요하다는 것을 알게 되었습니다.
+
+<br />
+
+### 참고
+
+- [React Search Auto Complete](https://github.com/sickdyd/react-search-autocomplete#readme)
+- [React Profiler API 공식 문서](https://react.dev/reference/react/Profiler)
+- [When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)
+- [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
