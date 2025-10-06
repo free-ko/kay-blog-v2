@@ -318,8 +318,15 @@ export default function About() {
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                   서비스에서 사용되는 React-Search-Autocomplete의 성능 이슈를
-                  근본적으로 해결하기 위해 라이브러리를 분석하고 자체 컴포넌트로
-                  재구축했습니다. 중복 상태 관리 로직을 제거하여 리렌더링을
+                  근본적으로 해결하기 위해{" "}
+                  <Link
+                    target="_blank"
+                    href="/docs/library-customize"
+                    className="text-zinc-300 underline"
+                  >
+                    라이브러리를 분석하고 자체 컴포넌트
+                  </Link>
+                  로 재구축했습니다. 중복 상태 관리 로직을 제거하여 리렌더링을
                   최소화하고, 개발자 친화적인 API를 제공하여 팀 전체의 개발
                   효율성을 향상시켰습니다.
                 </p>
