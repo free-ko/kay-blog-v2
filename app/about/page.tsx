@@ -75,7 +75,7 @@ export default function About() {
                   이를 해결하기 위해 웹 레포지토리 전용{" "}
                   <Link
                     target="_blank"
-                    href="/docs/web-butler-mcp"
+                    href="https://kay-blog-v2.vercel.app/docs/web-butler-mcp"
                     className="text-zinc-300 underline"
                   >
                     '웹집사 MCP'
@@ -190,7 +190,7 @@ export default function About() {
                   글로벌 유저 대응을 위한{" "}
                   <Link
                     target="_blank"
-                    href="/docs/global-language"
+                    href="https://kay-blog-v2.vercel.app/docs/global-language"
                     className="text-zinc-300 underline"
                   >
                     다국어
@@ -215,7 +215,7 @@ export default function About() {
                   웹뷰 결제 시스템을 결제 수단별로{" "}
                   <Link
                     target="_blank"
-                    href="/docs/payment-system-modularization"
+                    href="https://kay-blog-v2.vercel.app/docs/payment-system-modularization"
                     className="text-zinc-300 underline"
                   >
                     모듈화
@@ -271,7 +271,7 @@ export default function About() {
                   이를 해결하기 위해 WebSocket 기반{" "}
                   <Link
                     target="_blank"
-                    href="/docs/waiting-room"
+                    href="https://kay-blog-v2.vercel.app/docs/waiting-room"
                     className="text-zinc-300 underline"
                   >
                     대기룸
@@ -335,7 +335,7 @@ export default function About() {
                   콘텐츠 플랫폼의 검색 엔진 노출 부족 문제를 해결하기 위해{" "}
                   <Link
                     target="_blank"
-                    href="/docs/apply-articlejsonId"
+                    href="https://kay-blog-v2.vercel.app/docs/apply-articlejsonId"
                     className="text-zinc-300 underline"
                   >
                     구조화된 데이터
@@ -343,7 +343,7 @@ export default function About() {
                   를 적용했습니다. 또한 반복적으로 구현되던 SNS{" "}
                   <Link
                     target="_blank"
-                    href="/docs/3rd-party-management"
+                    href="https://kay-blog-v2.vercel.app/docs/3rd-party-management"
                     className="text-zinc-300 underline"
                   >
                     공유 기능
@@ -360,7 +360,7 @@ export default function About() {
                   근본적으로 해결하기 위해{" "}
                   <Link
                     target="_blank"
-                    href="/docs/library-customize"
+                    href="https://kay-blog-v2.vercel.app/docs/library-customize"
                     className="text-zinc-300 underline"
                   >
                     라이브러리를 분석하고 자체 컴포넌트
