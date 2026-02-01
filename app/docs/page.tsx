@@ -8,11 +8,11 @@ import { Article } from "./article";
 
 export default async function DocsPage() {
   const featured = allProjects.find(
-    (project) => project.slug === "payment-system-modularization"
+    (project) => project.slug === "web-butler-mcp"
   )!;
   const top2 = allProjects.find((project) => project.slug === "waiting-room")!;
   const top3 = allProjects.find(
-    (project) => project.slug === "library-customize"
+    (project) => project.slug === "payment-system-modularization"
   )!;
   const sorted = allProjects
     .filter((p) => p.published)
