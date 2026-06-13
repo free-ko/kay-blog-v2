@@ -67,6 +67,26 @@ export default function About() {
             <div className="space-y-4 sm:space-y-6">
               <div>
                 <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
+                  배포 속도 개선으로 팀 대기 시간 단축
+                </h4>
+                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                  배포가 평균 6~8분(길게는 17분) 걸려, 빠른 QA와 개발 흐름에
+                  병목이 생기는 문제가 있었습니다.
+                  <br />
+                  원인을 분석해 불필요한 빌드 과정을 걷어내고,{" "}
+                  <Link
+                    target="_blank"
+                    href="https://kay-blog-v2.vercel.app/docs/nextjs-deploy-optimization"
+                    className="text-zinc-300 underline"
+                  >
+                    이미지 경량화와 빌드 캐시 최적화
+                  </Link>
+                  를 적용했습니다. 그 결과 <b>배포 시간을 3분대로 단축</b>했습니다.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-medium text-white mb-2 text-sm sm:text-base">
                   웹집사 MCP로 온보딩·협업 비용 절감
                 </h4>
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
