@@ -67,6 +67,50 @@ export default function About() {
             <div className="space-y-8 sm:space-y-10">
               <div>
                 <h4 className="font-medium text-white mb-3 text-sm sm:text-base">
+                  CDN 캐시 적용으로 불필요한 서버 증설 제거
+                </h4>
+                <div className="space-y-2.5">
+                  <div className="flex gap-2.5">
+                    <span className="shrink-0 mt-0.5 text-[11px] font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded px-1.5 py-0.5 h-fit">
+                      문제
+                    </span>
+                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                      푸시 한 번에 서버가 15대까지 늘었는데 평균 CPU는
+                      31%였습니다. 부하가 아니라 요청 개수가 서버를 늘리고
+                      있었습니다.
+                    </p>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <span className="shrink-0 mt-0.5 text-[11px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-500/20 rounded px-1.5 py-0.5 h-fit">
+                      해결
+                    </span>
+                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                      요청 36건 중 34건이 정적 파일임을 확인하고, 로컬 빌드와
+                      운영 파일의 해시를 대조해 안전성을 검증한 뒤 타 팀과 함께{" "}
+                      <Link
+                        target="_blank"
+                        href="https://kay-blog-v2.vercel.app/docs/origin-traffic-optimization"
+                        className="text-zinc-300 underline"
+                      >
+                        정적 파일 경로에만 CDN 캐시를 적용
+                      </Link>
+                      했습니다.
+                    </p>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <span className="shrink-0 mt-0.5 text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded px-1.5 py-0.5 h-fit">
+                      성과
+                    </span>
+                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                      <b>서버로 들어오는 트래픽을 96% 절감</b>했고, 이후
+                      트래픽으로 인한 서버 증설은 0건입니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium text-white mb-3 text-sm sm:text-base">
                   배포 속도 개선으로 팀 대기 시간 단축
                 </h4>
                 <div className="space-y-2.5">
