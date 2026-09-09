@@ -18,8 +18,8 @@ export default function About() {
               저는 기술로 사람들의 <b>일상을 편리하게 만드는 것이</b> 개발자의
               역할이라고 생각합니다.
               <br />
-              특히 <b>동료들과 사용자의 목적을 달성</b>하도록 함께 고민 할 때
-              가장 큰 보람을 느낍니다.
+              특히 <b>사용자가 목적을 달성할 수 있도록 동료들과 함께 고민</b>할
+              때 가장 큰 보람을 느낍니다.
             </p>
             <p>
               완벽한 코드를 혼자 작성하는 것보다, <b>팀 전체가 이해하고 개선</b>
@@ -33,8 +33,8 @@ export default function About() {
               <b>동료들과 주고받는 솔직한 피드백</b>은 그 자산을 더욱 단단하게
               만듭니다.
               <br />
-              이러한 협업의 과정 속에서 사용자의 일상에 도움을 주는 서비스가
-              탄생한다고 생각합니다.
+              이러한 협업 과정에서 사용자의 일상에 도움을 주는 서비스가
+              만들어진다고 믿습니다.
             </p>
           </div>
         </header>
@@ -75,9 +75,9 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      푸시 한 번에 서버가 15대까지 늘었는데 평균 CPU는
-                      31%였습니다. 부하가 아니라 요청 개수가 서버를 늘리고
-                      있었습니다.
+                      콘텐츠 푸시 알림 한 번에 서버가 15대까지 늘었는데 평균
+                      CPU는 31%였습니다. CPU 부하가 아니라 요청 수 기준의
+                      오토스케일링 정책이 서버를 늘리고 있었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -85,8 +85,9 @@ export default function About() {
                       해결
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      요청 36건 중 34건이 정적 파일임을 확인하고, 로컬 빌드와
-                      운영 파일의 해시를 대조해 안전성을 검증한 뒤 타 팀과 함께{" "}
+                      페이지 한 번을 여는 데 발생하는 요청 36건 중 34건이 정적
+                      파일임을 확인했습니다. 로컬 빌드와 운영 파일의 해시를
+                      대조해 안전성을 검증한 뒤 타 팀과 함께{" "}
                       <Link
                         target="_blank"
                         href="https://kay-blog-v2.vercel.app/docs/origin-traffic-optimization"
@@ -102,7 +103,7 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      <b>서버로 들어오는 트래픽을 96% 절감</b>했고, 이후
+                      <b>오리진 서버로 들어오는 트래픽을 96% 절감</b>했고, 이후
                       트래픽으로 인한 서버 증설은 0건입니다.
                     </p>
                   </div>
@@ -119,8 +120,8 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      배포가 평균 6~8분(길게는 17분) 걸려, 빠른 QA와 개발 흐름에
-                      병목이 생겼습니다.
+                      배포가 평균 6~8분, 길게는 17분까지 걸려 QA 확인과 개발
+                      사이클에 병목이 생겼습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -128,7 +129,8 @@ export default function About() {
                       해결
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      원인을 분석해 불필요한 빌드 과정을 걷어내고,{" "}
+                      빌드 단계별로 시간을 측정해, 실행될 일이 없는 arm64
+                      아키텍처 빌드와 같은 커밋의 중복 빌드를 제거하고{" "}
                       <Link
                         target="_blank"
                         href="https://kay-blog-v2.vercel.app/docs/nextjs-deploy-optimization"
@@ -144,7 +146,7 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      <b>배포 시간을 3분대로 단축</b>했습니다.
+                      배포 시간을 <b>6~8분에서 3분대로 단축</b>했습니다.
                     </p>
                   </div>
                 </div>
@@ -160,7 +162,7 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      기존 디자인 시스템이 앱 팀에 맞춰져 있어, 웹은 서비스
+                      기존 디자인 시스템이 앱 팀에 맞춰져 있어, 웹에서는 서비스
                       레포마다 파운데이션과 컴포넌트를 매번 직접 만들어야
                       했습니다.
                     </p>
@@ -171,11 +173,11 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       운영 중인 서비스에 영향이 없도록{" "}
-                      <b>토큰 → 단순 → 복합 컴포넌트</b> 순으로 웹용 디자인
-                      시스템을 단계적으로 도입했습니다. 나아가 Figma Code
-                      Connect로 디자인과 코드 컴포넌트를 연결해, Figma MCP·AI로
-                      개발할 때도 디자인 시스템 규칙에 맞는 컴포넌트가 자동
-                      연동되도록 만들었습니다.
+                      <b>디자인 토큰, 단순 컴포넌트, 복합 컴포넌트</b> 순으로
+                      웹용 디자인 시스템을 단계적으로 도입했습니다. 나아가 Figma
+                      Code Connect로 디자인과 코드 컴포넌트를 연결해, Figma
+                      MCP와 AI로 개발할 때도 디자인 시스템 규칙에 맞는
+                      컴포넌트를 자동으로 가져오게 만들었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -183,9 +185,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      AI로 개발할 때도 디자인 시스템에 정의된 컴포넌트를 그대로
-                      가져와 쓰게 되면서, <b>일관된 UI</b>를 빠르게 만들 수 있게
-                      되었습니다.
+                      서비스 레포마다 파운데이션을 다시 만드는 작업이 사라졌고,
+                      AI가 생성한 화면도 디자인 시스템에 정의된 컴포넌트로
+                      구성되어 <b>일관된 UI</b>를 빠르게 만들 수 있습니다.
                     </p>
                   </div>
                 </div>
@@ -201,10 +203,10 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      디자이너가 Figma에서 아이콘을 수정할 때마다 아사나
-                      태스크로 앱·웹 개발자에게 각각 요청이 오갔고, 각자
-                      수작업으로 옮긴 뒤 디자이너가 컨펌하는 과정이 매주
-                      반복됐습니다.
+                      디자이너가 Figma에서 아이콘을 수정할 때마다 Asana
+                      태스크로 앱·웹 개발자에게 각각 요청했습니다. 개발자가
+                      수작업으로 옮기고 디자이너가 다시 컨펌하는 과정이 매주
+                      플랫폼 수만큼 반복되었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -220,9 +222,9 @@ export default function About() {
                       >
                         자동으로 PR을 생성하는 파이프라인
                       </Link>
-                      을 구축했습니다. 일시적인 네트워크 실패를 삭제로 오해하지
-                      않도록 하는 등 무인 실행 환경의 안전장치도 함께
-                      설계했습니다.
+                      을 구축했습니다. 일시적인 네트워크 실패를 아이콘 삭제로
+                      오판하지 않도록 하는 등 무인 실행 환경에 필요한 안전장치도
+                      함께 설계했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -230,10 +232,10 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      개발자는 자동 생성된 PR을 리뷰·머지만 하면 되고,
-                      디자이너가 등록하던 아이콘 생성·수정 요청 태스크를
-                      확인·대응할 필요가 없어져{" "}
-                      <b>확인·의사소통에 드는 리소스를 크게 절감</b>했습니다.
+                      매주 반복되던 요청 태스크 등록, 수작업 반영, 컨펌 과정이
+                      사라졌습니다. 개발자는 자동 생성된 PR을 리뷰하고 머지하는
+                      일만 남아{" "}
+                      <b>아이콘 반영에 드는 확인과 소통 비용을 크게 절감</b>했습니다.
                     </p>
                   </div>
                 </div>
@@ -250,8 +252,8 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       신규 입사자나 타 팀원이 웹 코드베이스를 파악할 때마다
-                      담당자에게 직접 물어야 해서, 양쪽의 업무 흐름이
-                      끊겼습니다.
+                      담당자에게 직접 물어야 해서, 질문하는 쪽과 답하는 쪽 모두
+                      작업을 중단해야 했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -276,8 +278,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      입사자의 온보딩 시간과 팀 간 커뮤니케이션 비용을
-                      줄였습니다.
+                      타 팀원이 웹 담당자를 거치지 않고 직접 코드 구조를
+                      확인하게 되어 '이거 어디 있어요?' 같은 질문이 현저히
+                      줄었고, 신규 입사자의 온보딩 시간도 단축되었습니다.
                     </p>
                   </div>
                 </div>
@@ -294,7 +297,7 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       팀원들이 Cursor, Claude Code 등 서로 다른 AI 도구를 쓰면서
-                      코드 스타일이 제각각이 되는 문제가 있었습니다.
+                      생성되는 코드 스타일이 제각각이었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -302,10 +305,10 @@ export default function About() {
                       해결
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      모든 AI 도구가 참조하는 통합 컨벤션 문서 Agent.md를 주도해
-                      작성하고, 합의된 규칙이 개발 시 자동으로 검증되도록
-                      자동화했습니다. 여기에 누가 실행하든 동일한 품질의
-                      결과물이 나오는 팀 전용 AI 커맨드도 설계했습니다.
+                      모든 AI 도구가 참조하는 통합 컨벤션 문서 Agent.md 작성을
+                      주도하고, 합의된 규칙이 개발 중에 자동으로 검증되도록
+                      구성했습니다. 여기에 누가 실행하든 동일한 품질의 결과물이
+                      나오는 팀 전용 AI 커맨드도 설계했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -313,8 +316,8 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      PR 리뷰가 스타일 논의에서 벗어나{" "}
-                      <b>비즈니스 로직과 설계에 집중</b>할 수 있게 되었습니다.
+                      PR 리뷰가 스타일 논의에서 벗어나, 리뷰어가{" "}
+                      <b>비즈니스 로직과 설계에 집중</b>하게 되었습니다.
                     </p>
                   </div>
                 </div>
@@ -330,8 +333,9 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      태스크 진행 상태를 매번 슬랙·구두로 공유하면서 협업하는
-                      팀원들과 상황을 맞추는 데 불필요한 비용이 들었습니다.
+                      태스크 진행 상태를 매번 Slack이나 구두로 공유해야 해서,
+                      협업하는 팀원들과 상황을 맞추는 데 불필요한 시간이
+                      들었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -350,8 +354,8 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      팀원들이 별도 공유 없이 태스크만으로 진행 상황을 파악할 수
-                      있게 되어, 상태 공유에 신경 쓰지 않고{" "}
+                      팀원들이 별도 공유 없이 태스크만 보고 진행 상황을 파악할
+                      수 있게 되어, 개발자가 상태 공유에 시간을 쓰지 않고{" "}
                       <b>개발에만 집중</b>할 수 있는 환경을 만들었습니다.
                     </p>
                   </div>
@@ -378,10 +382,10 @@ export default function About() {
                       해결
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      예외 상황별 UI를 디자이너·기획자분들께 제안하고, 화면마다
+                      예외 상황별 UI를 디자이너와 기획자에게 제안하고, 화면마다
                       반복되던 토스 웹뷰의 뒤로가기 처리를 하나의 공통 훅으로
-                      묶었습니다. 또한 수동 업로드로 비효율적이던 배포에 대해,
-                      앱인토스팀에 CLI 기반 배포 자동화를 제안했습니다.
+                      묶었습니다. 또한 수동 업로드에 의존하던 배포 과정을
+                      개선하도록 앱인토스팀에 CLI 기반 배포 자동화를 제안했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -389,9 +393,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      사용자가 <b>이탈 없이 서비스를 이어갈</b> 수 있게 했고,
-                      신규 화면에서 같은 예외 처리 패턴을 다시 구현하지 않아도
-                      되게 했습니다.
+                      예외 상황에서도 사용자가 <b>이탈 없이 서비스를 이어갈</b>
+                      수 있게 했고, 신규 화면은 공통 훅을 호출하는 것만으로 예외
+                      처리를 마칠 수 있게 되었습니다.
                     </p>
                   </div>
                 </div>
@@ -439,8 +443,8 @@ export default function About() {
                       >
                         다국어
                       </Link>{" "}
-                      지원 과정에서, 번역 작업마다 개발자가 개입해야 하는
-                      비효율을 발견했습니다.
+                      지원 과정에서, 번역 문구가 바뀔 때마다 개발자가 직접
+                      코드에 반영해야 했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -458,9 +462,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      기획자와 디자이너가 직접 번역을 수정할 수 있게 되었고,
-                      배포 시 최신 번역이 자동으로 반영되어 개발 시간을
-                      줄였습니다.
+                      기획자와 디자이너가 Google Sheets에서 직접 번역을 수정하고
+                      배포 시 최신 번역이 자동으로 반영되어, 번역 수정에
+                      개발자가 개입하는 일이 없어졌습니다.
                     </p>
                   </div>
                 </div>
@@ -520,8 +524,8 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       기존 Refine 프레임워크는 독자적인 컨벤션 때문에 수정
-                      작업마다 러닝커브가 발생했고, 다른 프로젝트와 기술 스택이
-                      달라 코드 재사용도 불가능했습니다.
+                      작업마다 학습 비용이 발생했고, 다른 프로젝트와 기술 스택이
+                      달라 코드를 재사용할 수도 없었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -556,7 +560,7 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      어드민 시스템의 빌드 시간이 6분에 달해, 하루 평균 7-8회
+                      어드민 시스템의 빌드 시간이 6분에 달해, 하루 평균 7~8회
                       배포 시 45분 이상을 대기해야 했습니다.
                     </p>
                   </div>
@@ -584,7 +588,7 @@ export default function About() {
 
               <div>
                 <h4 className="font-medium text-white mb-3 text-sm sm:text-base">
-                  대규모 트래픽 처리를 위한 공연 좌석제 시스템 구축
+                  공연 티켓 오픈 트래픽을 분산하는 대기룸 시스템 구축
                 </h4>
                 <div className="space-y-2.5">
                   <div className="flex gap-2.5">
@@ -592,8 +596,8 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      인기 공연 오픈 시 트래픽이 집중되면서 화면 멈춤과 결제
-                      실패 문제가 발생했습니다.
+                      인기 공연 티켓 오픈 시 10만 명이 동시에 좌석 선택
+                      페이지로 몰려, 화면 멈춤과 결제 실패가 발생했습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -618,8 +622,8 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      동시 접속자 10만 명 환경에서도 안정적인 서비스 운영이
-                      가능해졌습니다.
+                      동시 접속자 10만 명 규모의 티켓 오픈에서도 서비스를
+                      안정적으로 운영할 수 있게 되었습니다.
                     </p>
                   </div>
                 </div>
@@ -659,8 +663,8 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      비일관적인 프로젝트 구조로 협업 시 커뮤니케이션 리소스가
-                      크게 들었습니다.
+                      프로젝트 구조에 일관성이 없어, 협업할 때 코드의 위치와
+                      역할을 설명하는 데 많은 시간이 들었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -685,8 +689,8 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      팀원들의 코드 이해 시간이 단축되고 커뮤니케이션 리소스가
-                      줄며 유지보수성이 개선되었습니다.
+                      팀원들이 코드를 파악하는 시간과 구조를 설명하는 소통이
+                      줄어, 유지보수하기 쉬운 코드베이스를 만들었습니다.
                     </p>
                   </div>
                 </div>
@@ -734,8 +738,8 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      검색 엔진 노출을 개선하고, 공유 기능의 유지보수 효율성을
-                      높였습니다.
+                      콘텐츠가 검색 결과에 구조화된 형태로 노출되고, 공유 기능은
+                      한 곳만 수정하면 모든 화면에 반영되도록 만들었습니다.
                     </p>
                   </div>
                 </div>
@@ -750,8 +754,9 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      서비스에서 사용하던 React-Search-Autocomplete에 성능
-                      이슈가 있었습니다.
+                      서비스에서 사용하던 React-Search-Autocomplete가 한 글자를
+                      입력할 때마다 3~4회 리렌더링되어, 검색 입력이 눈에 띄게
+                      지연되었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -759,7 +764,7 @@ export default function About() {
                       해결
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      원인을 근본적으로 해결하기 위해{" "}
+                      증상을 우회하지 않고 원인을 제거하기 위해{" "}
                       <Link
                         target="_blank"
                         href="https://kay-blog-v2.vercel.app/docs/library-customize"
@@ -776,8 +781,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      리렌더링을 줄이고 개발자 친화적인 API를 제공해, 팀 전체의
-                      개발 효율성을 향상시켰습니다.
+                      글자당 리렌더링을 3~4회에서 1회로 줄여 입력 지연을
+                      해소했고, 단순한 API를 제공해 팀원들이 내부 구현을 몰라도
+                      검색 컴포넌트를 쓸 수 있게 했습니다.
                     </p>
                   </div>
                 </div>
@@ -824,8 +830,9 @@ export default function About() {
                       문제
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      JavaScript 프로젝트의 잦은 런타임 에러와, 느린 앱
-                      다운로드로 인한 설치 포기 문제가 있었습니다.
+                      JavaScript로만 작성된 프로젝트에서 런타임 에러가 잦았고,
+                      앱 용량이 91MB에 달해 다운로드 중 설치를 포기하는
+                      사용자가 있었습니다.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
@@ -842,8 +849,9 @@ export default function About() {
                       성과
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                      앱 용량을 58% 감소(91MB → 38MB)시키고 초기 로딩 속도를
-                      개선했으며, 런타임 에러를 줄여 유지보수성을 높였습니다.
+                      앱 용량을 91MB에서 38MB로 58% 줄여 초기 로딩 속도를
+                      개선했고, 타입 검사로 런타임 에러를 줄여 유지보수성을
+                      높였습니다.
                     </p>
                   </div>
                 </div>
@@ -884,7 +892,8 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       사용자가 자신에게 맞는 지원금을 쉽게 찾을 수 있게 했고,
-                      서버 부하를 감소시켰습니다.
+                      입력 중 발생하던 불필요한 API 호출을 제거해 서버 부하를
+                      줄였습니다.
                     </p>
                   </div>
                 </div>
@@ -933,7 +942,7 @@ export default function About() {
                   >
                     <strong>함수형 프로그래밍 스터디</strong>
                   </Link>
-                  : 쏙쏙들어오는 함수형 코딩 책 기반 실습
+                  : 《쏙쏙 들어오는 함수형 코딩》 책 기반 실습
                 </li>
                 <li>
                   <Link
