@@ -104,7 +104,7 @@ export default function About() {
                     </span>
                     <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                       <b>오리진 서버로 들어오는 트래픽을 96% 절감</b>했고, 이후
-                      트래픽으로 인한 <b>서버 증설은 0건</b>입니다.
+                      요청 수 알람으로 발생한 <b>자동 증설(스케일아웃)은 0건</b>입니다.
                     </p>
                   </div>
                 </div>
